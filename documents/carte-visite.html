@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Carte de visite — FjordTech Finance</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: #d0d8e4;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      gap: 60px;
+    }
+
+    h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #4a5e7a;
+      text-align: center;
+    }
+
+    .card-set {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+
+    /* ---- CARD SIZE: 85mm x 54mm ---- */
+    .card {
+      width: 85mm;
+      height: 54mm;
+      border-radius: 3mm;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,.22);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    /* ============================
+       RECTO — Fond marine
+       ============================ */
+    .recto {
+      background: #0b1a2e;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 6mm 7mm 5mm;
+    }
+
+    .recto::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 40mm; height: 40mm;
+      background: radial-gradient(circle, rgba(56,182,255,.10) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .recto::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #c9993a, #38b6ff 60%, transparent);
+    }
+
+    .recto-logo img {
+      height: 14mm;
+      width: auto;
+      display: block;
+    }
+
+    .recto-name {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+      letter-spacing: -.01em;
+    }
+
+    .recto-title {
+      font-size: 6.5pt;
+      color: #c9993a;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .recto-creds {
+      font-size: 5.5pt;
+      color: rgba(255,255,255,.4);
+      margin-top: 3px;
+      letter-spacing: .03em;
+    }
+
+    /* ============================
+       VERSO — Fond or sombre
+       ============================ */
+    .verso {
+      background: #0b1a2e;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6mm 7mm;
+      position: relative;
+    }
+
+    .verso::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #0f2240 0%, #0b1a2e 60%);
+    }
+
+    .verso::after {
+      content: '';
+      position: absolute;
+      left: 7mm;
+      top: 0; bottom: 0;
+      width: 1.5px;
+      background: linear-gradient(180deg, transparent, #c9993a 30%, #38b6ff 70%, transparent);
+    }
+
+    .verso-inner {
+      position: relative;
+      padding-left: 5mm;
+      display: flex;
+      flex-direction: column;
+      gap: 3mm;
+    }
+
+    .verso-row {
+      display: flex;
+      align-items: center;
+      gap: 3mm;
+    }
+
+    .verso-icon {
+      width: 4mm;
+      height: 4mm;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #c9993a, #e8b84b);
+      flex-shrink: 0;
+    }
+
+    .verso-icon.blue {
+      background: linear-gradient(135deg, #38b6ff, #6ecfff);
+    }
+
+    .verso-label {
+      font-size: 5pt;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+      width: 10mm;
+      flex-shrink: 0;
+    }
+
+    .verso-value {
+      font-size: 7.5pt;
+      color: rgba(255,255,255,.88);
+      font-weight: 500;
+    }
+
+    .verso-tagline {
+      position: absolute;
+      bottom: 4mm;
+      right: 6mm;
+      font-size: 5pt;
+      color: rgba(255,255,255,.2);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-align: right;
+      font-style: italic;
+    }
+
+    /* ---- LABELS ---- */
+    .face-label {
+      font-size: .72rem;
+      font-weight: 600;
+      color: #8a9ab5;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: -12px;
+    }
+
+    /* ---- PRINT ---- */
+    .print-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0b1a2e;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 4px 20px rgba(0,0,0,.3);
+    }
+
+    .print-btn:hover { background: #c9993a; color: #0b1a2e; }
+
+    .print-note {
+      font-size: .78rem;
+      color: #6a7a8a;
+      text-align: center;
+      max-width: 320px;
+      line-height: 1.5;
+    }
+
+    @media print {
+      body { background: none; padding: 20mm; gap: 8mm; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; align-items: flex-start; }
+      .card-set { flex-direction: row; gap: 8mm; }
+      h2, .face-label, .print-btn, .print-note { display: none; }
+      .card { box-shadow: none; }
+      @page { size: A4; margin: 15mm; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">Imprimer / Enregistrer PDF</button>
+
+<h2>Carte de visite — FjordTech Finance (85 × 54 mm)</h2>
+
+<div class="card-set">
+
+  <p class="face-label">Recto</p>
+
+  <!-- RECTO -->
+  <div class="card recto">
+    <div class="recto-logo">
+      <img src="../assets/img/logo.jpg" alt="FjordTech Finance">
+    </div>
+    <div>
+      <div class="recto-name">Christian Jerome<br>Chendjou Feze</div>
+      <div class="recto-title">Fondateur · Comptable-fiscaliste · Criminologue</div>
+      <div class="recto-creds">FMVA® · FPAP™ · BIDA® · FTIP® · CMSA® · CBCA® · FPWMP®</div>
+    </div>
+  </div>
+
+  <p class="face-label">Verso</p>
+
+  <!-- VERSO -->
+  <div class="card verso">
+    <div class="verso-inner">
+      <div class="verso-row">
+        <div class="verso-icon"></div>
+        <div class="verso-label">Courriel</div>
+        <div class="verso-value">info@fjordtechfinance.ca</div>
+      </div>
+      <div class="verso-row">
+        <div class="verso-icon blue"></div>
+        <div class="verso-label">Tél.</div>
+        <div class="verso-value">+1 (418) 000-0000</div>
+      </div>
+      <div class="verso-row">
+        <div class="verso-icon"></div>
+        <div class="verso-label">Web</div>
+        <div class="verso-value">fjordtechfinance.ca</div>
+      </div>
+      <div class="verso-row">
+        <div class="verso-icon blue"></div>
+        <div class="verso-label">Région</div>
+        <div class="verso-value">Saguenay–Lac-Saint-Jean, QC</div>
+      </div>
+    </div>
+    <div class="verso-tagline">Comptabilité · Fiscalité · Technologie</div>
+  </div>
+
+</div>
+
+<p class="print-note">Imprimer → Enregistrer en PDF, puis envoyer à votre imprimeur en spécifiant le format 85 × 54 mm avec fond perdu 3 mm.</p>
+
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Papier entête — FjordTech Finance</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: #e8edf3;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      box-shadow: 0 8px 40px rgba(0,0,0,.15);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ---- HEADER ---- */
+    .header {
+      background: #0b1a2e;
+      padding: 28px 40px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #c9993a 0%, #38b6ff 60%, transparent 100%);
+    }
+
+    .header-logo img {
+      height: 52px;
+      width: auto;
+      display: block;
+    }
+
+    .header-contact {
+      text-align: right;
+      color: rgba(255,255,255,.75);
+      font-size: 8.5pt;
+      line-height: 1.7;
+    }
+
+    .header-contact strong {
+      color: #c9993a;
+      font-size: 7.5pt;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* ---- GOLD BAR ---- */
+    .gold-bar {
+      background: linear-gradient(90deg, #c9993a, #e8b84b);
+      height: 2px;
+    }
+
+    /* ---- BODY ---- */
+    .body {
+      flex: 1;
+      padding: 40px 40px 30px;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      font-size: 9pt;
+      color: #4a5e7a;
+    }
+
+    .meta-row .date {
+      font-weight: 600;
+      color: #0b1a2e;
+    }
+
+    .meta-row .ref {
+      color: #c9993a;
+      font-weight: 600;
+    }
+
+    .recipient {
+      margin-bottom: 36px;
+      font-size: 9.5pt;
+      line-height: 1.6;
+      color: #1a2d4a;
+    }
+
+    .recipient .name {
+      font-weight: 700;
+      font-size: 10pt;
+      color: #0b1a2e;
+    }
+
+    .subject-line {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 28px;
+      padding-bottom: 12px;
+      border-bottom: 1.5px solid #e8edf3;
+    }
+
+    .subject-label {
+      font-size: 7.5pt;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #c9993a;
+      white-space: nowrap;
+    }
+
+    .subject-text {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #0b1a2e;
+      font-family: 'Playfair Display', Georgia, serif;
+    }
+
+    .letter-body {
+      font-size: 9.5pt;
+      line-height: 1.75;
+      color: #2a3d55;
+    }
+
+    .letter-body p { margin-bottom: 14px; }
+
+    .placeholder-line {
+      display: block;
+      height: 10px;
+      background: #f0f3f7;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .placeholder-line.short { width: 60%; }
+    .placeholder-line.medium { width: 80%; }
+    .placeholder-line.full { width: 100%; }
+
+    .salutation {
+      margin-top: 32px;
+      margin-bottom: 60px;
+      font-size: 9.5pt;
+      color: #2a3d55;
+    }
+
+    .signature-block {
+      margin-top: auto;
+    }
+
+    .sig-name {
+      font-size: 10pt;
+      font-weight: 700;
+      color: #0b1a2e;
+    }
+
+    .sig-title {
+      font-size: 8.5pt;
+      color: #c9993a;
+      font-weight: 600;
+      letter-spacing: .04em;
+      margin-top: 2px;
+    }
+
+    .sig-creds {
+      font-size: 7.5pt;
+      color: #4a5e7a;
+      margin-top: 4px;
+    }
+
+    /* ---- FOOTER ---- */
+    .footer {
+      background: #0b1a2e;
+      padding: 14px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-left {
+      font-size: 7pt;
+      color: rgba(255,255,255,.45);
+      line-height: 1.5;
+    }
+
+    .footer-right {
+      font-size: 7pt;
+      color: rgba(255,255,255,.45);
+      text-align: right;
+    }
+
+    .footer-divider {
+      color: #c9993a;
+      margin: 0 6px;
+    }
+
+    /* ---- DECORATIVE ---- */
+    .deco-corner {
+      position: absolute;
+      top: 0; right: 0;
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(225deg, rgba(56,182,255,.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ---- PRINT ---- */
+    @media print {
+      body { background: none; padding: 0; }
+      .page { box-shadow: none; width: 100%; min-height: 100vh; }
+      @page { size: A4; margin: 0; }
+    }
+
+    .print-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0b1a2e;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 4px 20px rgba(0,0,0,.25);
+    }
+
+    .print-btn:hover { background: #c9993a; color: #0b1a2e; }
+
+    @media print { .print-btn { display: none; } }
+  </style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">Imprimer / Enregistrer PDF</button>
+
+<div class="page">
+  <div class="deco-corner"></div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo">
+      <img src="../assets/img/logo.jpg" alt="FjordTech Finance">
+    </div>
+    <div class="header-contact">
+      <strong>Coordonnées</strong>
+      info@fjordtechfinance.ca<br>
+      +1 (418) 000-0000<br>
+      Saguenay–Lac-Saint-Jean, Québec<br>
+      fjordtechfinance.ca
+    </div>
+  </div>
+  <div class="gold-bar"></div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <div class="meta-row">
+      <span class="date">Saguenay, le ___________________</span>
+      <span class="ref">Réf. : ___________________</span>
+    </div>
+
+    <div class="recipient">
+      <div class="name">Nom du destinataire</div>
+      Titre / Fonction<br>
+      Entreprise<br>
+      Adresse ligne 1<br>
+      Ville, Province, Code postal
+    </div>
+
+    <div class="subject-line">
+      <span class="subject-label">Objet :</span>
+      <span class="subject-text">Titre de votre lettre</span>
+    </div>
+
+    <div class="letter-body">
+      <p>Madame, Monsieur,</p>
+
+      <p>
+        Veuillez trouver ci-dessous le contenu de votre correspondance. Ce modèle est
+        conçu pour être utilisé avec l'en-tête officiel de FjordTech Finance. Remplacez
+        ce texte par le corps de votre lettre.
+      </p>
+
+      <span class="placeholder-line full"></span>
+      <span class="placeholder-line full"></span>
+      <span class="placeholder-line medium"></span>
+      <br>
+      <span class="placeholder-line full"></span>
+      <span class="placeholder-line full"></span>
+      <span class="placeholder-line short"></span>
+      <br>
+      <span class="placeholder-line full"></span>
+      <span class="placeholder-line medium"></span>
+    </div>
+
+    <div class="salutation">
+      <p>Nous demeurons disponibles pour toute question et vous prions d'agréer, Madame, Monsieur, l'expression de nos sentiments professionnels les meilleurs.</p>
+    </div>
+
+    <div class="signature-block">
+      <div style="margin-bottom:40px">_____________________________</div>
+      <div class="sig-name">Christian Jerome Chendjou Feze</div>
+      <div class="sig-title">Fondateur · Comptable-fiscaliste · Criminologue</div>
+      <div class="sig-creds">FMVA® · FPAP™ · BIDA® · FTIP® · CMSA® · CBCA® · FPWMP®</div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-left">
+      FjordTech Finance<span class="footer-divider">·</span>Saguenay–Lac-Saint-Jean, Québec, Canada<br>
+      Comptabilité · Fiscalité · Analyse financière · Développement numérique
+    </div>
+    <div class="footer-right">
+      info@fjordtechfinance.ca<br>
+      fjordtechfinance.ca
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
