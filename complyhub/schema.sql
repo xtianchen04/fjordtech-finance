@@ -40,6 +40,7 @@ create table if not exists public.workers (
   program            text not null default 'PMI',   -- 'PMI' | 'PTET'
   occupation         text,
   work_permit_number text,
+  social_insurance_number text,        -- NAS — donnée sensible (PII), protégée par RLS
   permit_expiry      date,
   offered_wage       numeric(10, 2),
   offered_hours      numeric(6, 2),
