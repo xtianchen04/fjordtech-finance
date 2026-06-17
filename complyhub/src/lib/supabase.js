@@ -27,7 +27,12 @@ export const supabase = createClient(
 // ---------- Authentification ----------
 
 export async function signUp(email, password) {
-  const { data, error } = await supabase.auth.signUp({ email, password })
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    // Le lien de confirmation renvoie vers l'app (local ou domaine de production).
+    options: { emailRedirectTo: window.location.origin },
+  })
   if (error) throw error
   return data
 }

@@ -96,6 +96,14 @@ affichera une erreur explicite.
 
 Voir [`CLAUDE.md`](./CLAUDE.md) pour l'architecture détaillée et les conventions.
 
+## Déploiement (Vercel + GitHub + Supabase)
+
+Voir le guide complet : [`DEPLOY.md`](./DEPLOY.md).
+
+En bref : importez le dépôt dans Vercel, réglez le **Root Directory** sur `complyhub`,
+ajoutez les variables `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`, puis **Deploy**.
+Pensez à ajouter votre URL Vercel dans **Supabase → Authentication → URL Configuration**.
+
 ## Scripts
 
 | Commande          | Description                          |
