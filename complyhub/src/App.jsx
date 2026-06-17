@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { onAuthChange, getCurrentUser } from './lib/supabase'
 import { getMyOrganization } from './lib/api'
+import { enableDemo, DEMO_ORG, DEMO_USER } from './lib/demo'
 import Landing from './components/Landing'
 import Auth from './components/Auth'
 import Onboarding from './components/Onboarding'
@@ -14,6 +15,12 @@ export default function App() {
   const [user, setUser] = useState(null)
   const [org, setOrg] = useState(null)
   const [showAuth, setShowAuth] = useState(false) // bascule Landing → Auth
+  const [demo, setDemo] = useState(false) // mode démo (sans Supabase)
+
+  function startDemo() {
+    enableDemo()
+    setDemo(true)
+  }
 
   // Charge l'organisation de l'utilisateur courant (si connecté).
   async function refreshOrg() {
@@ -61,8 +68,15 @@ export default function App() {
     )
   }
 
+  // Mode démo : on entre directement dans le tableau de bord avec des données d'exemple.
+  if (demo) return <ComplyHub org={DEMO_ORG} user={DEMO_USER} demo />
+
   if (!user) {
-    return showAuth ? <Auth /> : <Landing onStart={() => setShowAuth(true)} />
+    return showAuth ? (
+      <Auth onDemo={startDemo} />
+    ) : (
+      <Landing onStart={() => setShowAuth(true)} onDemo={startDemo} />
+    )
   }
   if (!org) return <Onboarding onCreated={(o) => setOrg(o)} />
   return <ComplyHub org={org} user={user} />

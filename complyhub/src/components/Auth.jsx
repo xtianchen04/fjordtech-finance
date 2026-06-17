@@ -3,7 +3,7 @@ import { ShieldCheck, Loader2 } from 'lucide-react'
 import { signIn, signUp, isSupabaseConfigured } from '../lib/supabase'
 
 // Écran d'authentification (connexion / inscription).
-export default function Auth() {
+export default function Auth({ onDemo }) {
   const [mode, setMode] = useState('login') // 'login' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -64,6 +64,15 @@ export default function Auth() {
               Supabase n'est pas configuré. Créez <code>.env.local</code> avec
               <code> VITE_SUPABASE_URL</code> et <code>VITE_SUPABASE_ANON_KEY</code>, puis
               redémarrez le serveur.
+              {onDemo && (
+                <>
+                  {' '}Ou{' '}
+                  <button onClick={onDemo} className="font-bold underline">
+                    explorez la démo
+                  </button>{' '}
+                  sans configuration.
+                </>
+              )}
             </div>
           )}
 

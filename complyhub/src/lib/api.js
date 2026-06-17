@@ -1,7 +1,9 @@
 import { supabase, getCurrentUser } from './supabase'
+import { isDemo, demoStore } from './demo'
 
 // ============================================================
 //  Couche d'accès aux données ComplyHub (Supabase / PostgREST)
+//  En mode démo (isDemo()), les fonctions délèguent à demoStore.
 // ============================================================
 
 // ---------- Organisations ----------
@@ -33,6 +35,7 @@ export async function createOrganization(payload) {
 
 /** Récupère l'organisation de l'utilisateur connecté (ou null s'il n'en a pas encore). */
 export async function getMyOrganization() {
+  if (isDemo()) return demoStore.getMyOrganization()
   const user = await getCurrentUser()
   if (!user) return null
 
@@ -52,6 +55,7 @@ export async function getMyOrganization() {
 
 /** Liste les travailleurs d'une organisation. */
 export async function getWorkers(orgId) {
+  if (isDemo()) return demoStore.getWorkers(orgId)
   const { data, error } = await supabase
     .from('workers')
     .select('*')
@@ -67,6 +71,7 @@ export async function getWorkers(orgId) {
  * (une par condition du référentiel) avec le statut 'pending'.
  */
 export async function createWorker(orgId, payload) {
+  if (isDemo()) return demoStore.createWorker(orgId, payload)
   const { data: worker, error } = await supabase
     .from('workers')
     .insert({
@@ -95,6 +100,7 @@ export async function createWorker(orgId, payload) {
 
 /** Récupère le référentiel des conditions de conformité (table de référence). */
 export async function getConditions() {
+  if (isDemo()) return demoStore.getConditions()
   const { data, error } = await supabase
     .from('compliance_conditions')
     .select('*')
@@ -133,6 +139,7 @@ export async function generateWorkerCompliance(workerId, program = 'PMI') {
 
 /** Récupère l'état de conformité d'un travailleur, joint au référentiel. */
 export async function getWorkerCompliance(workerId) {
+  if (isDemo()) return demoStore.getWorkerCompliance(workerId)
   const { data, error } = await supabase
     .from('worker_compliance')
     .select('*, condition:compliance_conditions(*)')
@@ -144,6 +151,7 @@ export async function getWorkerCompliance(workerId) {
 
 /** Met à jour le statut d'une ligne de conformité. */
 export async function updateWorkerCompliance(complianceId, patch) {
+  if (isDemo()) return demoStore.updateWorkerCompliance(complianceId, patch)
   const { data, error } = await supabase
     .from('worker_compliance')
     .update({ ...patch, updated_at: new Date().toISOString() })
@@ -176,6 +184,7 @@ const DOCUMENTS_BUCKET = 'documents'
 
 /** Liste les documents d'une organisation. */
 export async function getDocuments(orgId) {
+  if (isDemo()) return demoStore.getDocuments(orgId)
   const { data, error } = await supabase
     .from('documents')
     .select('*')
@@ -192,6 +201,7 @@ export async function getDocuments(orgId) {
  * La conservation est fixée à 6 ans (R209.4).
  */
 export async function uploadDocument(orgId, { file, category, workerId = null }) {
+  if (isDemo()) return demoStore.uploadDocument(orgId, { file, category, workerId })
   const safeName = file.name.replace(/[^\w.\-]+/g, '_')
   const scope = workerId ?? 'general'
   const storagePath = `${orgId}/${scope}/${Date.now()}-${safeName}`
@@ -223,6 +233,7 @@ export async function uploadDocument(orgId, { file, category, workerId = null })
 
 /** Génère une URL signée temporaire pour télécharger / visualiser un document. */
 export async function getDocumentUrl(storagePath, expiresIn = 3600) {
+  if (isDemo()) return demoStore.getDocumentUrl(storagePath)
   const { data, error } = await supabase.storage
     .from(DOCUMENTS_BUCKET)
     .createSignedUrl(storagePath, expiresIn)
@@ -232,6 +243,7 @@ export async function getDocumentUrl(storagePath, expiresIn = 3600) {
 
 /** Supprime un document (fichier + métadonnées). */
 export async function deleteDocument(doc) {
+  if (isDemo()) return demoStore.deleteDocument(doc)
   const { error: rmErr } = await supabase.storage
     .from(DOCUMENTS_BUCKET)
     .remove([doc.storage_path])
@@ -245,6 +257,7 @@ export async function deleteDocument(doc) {
 
 /** Enregistre un résultat de simulation. */
 export async function saveSimulation(orgId, { score, answers }) {
+  if (isDemo()) return demoStore.saveSimulation(orgId, { score, answers })
   const user = await getCurrentUser()
   if (!user) throw new Error('Aucun utilisateur connecté.')
 
@@ -260,6 +273,7 @@ export async function saveSimulation(orgId, { score, answers }) {
 
 /** Historique des simulations d'une organisation. */
 export async function getSimulations(orgId) {
+  if (isDemo()) return demoStore.getSimulations(orgId)
   const { data, error } = await supabase
     .from('inspection_simulations')
     .select('*')
@@ -330,6 +344,7 @@ export function computeAlerts(workers, complianceByWorker, permitWindowDays = 90
  * Redirige le navigateur vers l'URL de paiement renvoyée.
  */
 export async function startCheckout(plan) {
+  if (isDemo()) return demoStore.startCheckout(plan)
   const { data, error } = await supabase.functions.invoke('create-checkout', {
     body: { plan, origin: window.location.origin },
   })

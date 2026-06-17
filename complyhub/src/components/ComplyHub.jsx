@@ -57,7 +57,7 @@ function initials(text = '') {
     .join('')
 }
 
-export default function ComplyHub({ org, user }) {
+export default function ComplyHub({ org, user, demo = false }) {
   const [tab, setTab] = useState('dashboard')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -216,6 +216,12 @@ export default function ComplyHub({ org, user }) {
 
       {/* MAIN */}
       <main className="flex-1 px-6 sm:px-10 py-8 max-w-[1100px]">
+        {demo && (
+          <div className="mb-5 text-[12.5px] bg-mist text-deep rounded-xl px-4 py-3 flex items-center gap-2">
+            <span className="font-bold">Mode démo</span> — données d'exemple, rien n'est
+            sauvegardé. Rechargez la page pour réinitialiser.
+          </div>
+        )}
         <div className="flex justify-between items-start mb-7 gap-4">
           <div>
             <h1 className="font-serif text-[27px] font-extrabold tracking-tight">{pageTitle}</h1>
@@ -233,7 +239,11 @@ export default function ComplyHub({ org, user }) {
                 {me?.email ?? 'Mon compte'}
               </span>
             </div>
-            <button onClick={() => signOut()} className="text-[#7A8FA0] hover:text-ink" title="Se déconnecter">
+            <button
+              onClick={() => (demo ? window.location.reload() : signOut())}
+              className="text-[#7A8FA0] hover:text-ink"
+              title={demo ? 'Quitter la démo' : 'Se déconnecter'}
+            >
               <LogOut size={18} />
             </button>
           </div>

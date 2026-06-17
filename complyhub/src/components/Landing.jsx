@@ -20,7 +20,7 @@ const FEATURES = [
 ]
 
 // Page d'accueil publique (visiteurs non connectés).
-export default function Landing({ onStart }) {
+export default function Landing({ onStart, onDemo }) {
   return (
     <div className="min-h-screen bg-paper text-ink">
       {/* Barre de navigation */}
@@ -49,10 +49,15 @@ export default function Landing({ onStart }) {
           leurs obligations réglementaires, organiser leurs documents et se préparer aux
           inspections d'IRCC et d'ESDC — en toute sérénité.
         </p>
-        <div className="flex items-center justify-center gap-3 mt-8">
+        <div className="flex items-center justify-center gap-3 mt-8 flex-wrap">
           <button onClick={onStart} className="btn-gold">
             Commencer gratuitement <ArrowRight size={16} />
           </button>
+          {onDemo && (
+            <button onClick={onDemo} className="btn-primary">
+              Voir la démo (sans inscription)
+            </button>
+          )}
         </div>
         <p className="text-[12px] text-[#9FB0BF] mt-4">
           Outil de gestion documentaire — ne constitue pas un conseil juridique (CICC).
