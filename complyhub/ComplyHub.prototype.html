@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ComplyHub — Plateforme de conformité TET/PMI</title>
+<style>
+  :root {
+    --ink: #0B1F33;
+    --deep: #13314F;
+    --steel: #2E6CA4;
+    --sky: #5AA0DC;
+    --mist: #E8F1F8;
+    --paper: #F7FAFC;
+    --gold: #C99A3B;
+    --green: #2E9E6B;
+    --amber: #E0A030;
+    --red: #D1495B;
+    --line: #D7E3EE;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    display: flex;
+    min-height: 100vh;
+  }
+  /* SIDEBAR */
+  aside {
+    width: 248px;
+    background: var(--ink);
+    color: #fff;
+    padding: 26px 16px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .logo { display: flex; align-items: center; gap: 11px; padding: 0 8px 26px; }
+  .logo-icon {
+    background: var(--gold); border-radius: 11px; padding: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-name { font-weight: 800; font-size: 19px; letter-spacing: -0.3px; font-family: Georgia, serif; }
+  .logo-sub { font-size: 10px; color: var(--sky); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  nav { display: flex; flex-direction: column; gap: 4px; }
+  .nav-btn {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    border-radius: 11px; border: none; cursor: pointer; text-align: left;
+    background: transparent; color: #A9C2D8; font-size: 14px; font-weight: 600;
+    transition: all .2s; font-family: inherit;
+  }
+  .nav-btn:hover { background: var(--deep); color: #fff; }
+  .nav-btn.active { background: var(--steel); color: #fff; }
+  .alert-box { margin-top: auto; background: var(--deep); border-radius: 14px; padding: 16px; }
+  .alert-title { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; font-weight: 700; color: #fff; }
+  .alert-text { font-size: 11.5px; color: #9FB8CE; line-height: 1.5; }
+  /* MAIN */
+  main { flex: 1; padding: 30px 38px; max-width: 1100px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
+  h1 { font-size: 27px; font-weight: 800; font-family: Georgia, serif; letter-spacing: -0.5px; }
+  .subtitle { color: #5E7385; font-size: 14px; margin-top: 6px; }
+  .user-chip {
+    display: flex; align-items: center; gap: 10px; background: #fff;
+    padding: 8px 14px; border-radius: 30px; border: 1px solid var(--line);
+  }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 16px; background: var(--steel);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+  }
+  /* CARDS */
+  .stats { display: flex; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+  .stat {
+    background: #fff; border-radius: 16px; padding: 18px 20px;
+    border: 1px solid var(--line); flex: 1; min-width: 150px;
+    box-shadow: 0 1px 3px rgba(11,31,51,0.04);
+  }
+  .stat-icon { border-radius: 10px; padding: 8px; display: inline-flex; margin-bottom: 10px; }
+  .stat-value { font-size: 28px; font-weight: 800; font-family: Georgia, serif; line-height: 1; }
+  .stat-label { font-size: 12.5px; color: #5E7385; margin-top: 6px; font-weight: 500; }
+  .row { display: flex; gap: 18px; margin-bottom: 22px; flex-wrap: wrap; }
+  .card { background: #fff; border-radius: 18px; padding: 22px; border: 1px solid var(--line); }
+  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+  /* GAUGE */
+  .gauge-wrap { display: flex; align-items: center; gap: 24px; flex: 1; min-width: 300px; }
+  .gauge { position: relative; width: 130px; height: 130px; flex-shrink: 0; }
+  .gauge-text {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .gauge-val { font-size: 30px; font-weight: 800; font-family: Georgia, serif; }
+  .gauge-lbl { font-size: 11px; color: #5E7385; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  /* WORKER LIST */
+  .worker { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--mist); }
+  .worker-name { font-size: 13.5px; font-weight: 600; }
+  .worker-role { font-size: 11.5px; color: #7A8FA0; }
+  .worker-score { font-weight: 700; font-size: 14px; }
+  /* CONDITIONS TABLE */
+  .table-head { padding: 18px 22px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  .filters { display: flex; gap: 6px; }
+  .filter-btn {
+    padding: 6px 13px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--line); background: #fff; color: #5E7385; font-family: inherit;
+  }
+  .filter-btn.active { border-color: var(--steel); background: var(--steel); color: #fff; }
+  .cond-row { display: flex; align-items: center; gap: 14px; padding: 13px 22px; border-bottom: 1px solid var(--mist); }
+  .cond-icon { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .cond-label { font-size: 13.5px; font-weight: 600; }
+  .cond-cat { font-size: 11px; color: #9FB0BF; margin-top: 1px; }
+  .badge { font-size: 10.5px; font-weight: 700; color: var(--steel); background: var(--mist); padding: 3px 9px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .status-text { font-size: 12px; font-weight: 700; min-width: 78px; text-align: right; }
+  /* HIDDEN TABS */
+  .tab { display: none; }
+  .tab.active { display: block; }
+  /* SIMULATOR */
+  .sim-hero { background: linear-gradient(135deg, var(--deep), var(--steel)); border-radius: 18px; padding: 28px; color: #fff; margin-bottom: 22px; }
+  .sim-hero h2 { font-size: 21px; font-weight: 800; margin: 12px 0 6px; font-family: Georgia, serif; }
+  .sim-hero p { font-size: 13.5px; color: #CFE0EF; line-height: 1.6; }
+  .q-card { background: #fff; border-radius: 14px; padding: 18px; margin-bottom: 12px; border: 1px solid var(--line); }
+  .q-num { width: 26px; height: 26px; border-radius: 13px; background: var(--mist); color: var(--steel); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .q-text { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .q-ref { font-size: 11.5px; color: #9FB0BF; margin-bottom: 12px; }
+  .ans-btn { padding: 7px 16px; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 2px solid transparent; font-family: inherit; }
+  /* VAULT */
+  .vault-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .folder { background: #fff; border-radius: 14px; padding: 18px; border: 1px solid var(--line); cursor: pointer; transition: transform .15s; }
+  .folder:hover { transform: translateY(-2px); }
+  .folder-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .folder-count { font-size: 12px; color: #7A8FA0; margin-bottom: 8px; }
+  .folder-status { font-size: 11px; font-weight: 600; }
+  .info-bar { margin-top: 18px; background: var(--mist); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 11px; font-size: 12.5px; color: var(--deep); }
+  /* GENERATOR */
+  .gen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .gen-card { background: #fff; border-radius: 16px; padding: 22px; border: 1px solid var(--line); }
+  .gen-icon { background: var(--ink); border-radius: 11px; padding: 10px; display: inline-flex; margin-bottom: 14px; }
+  .gen-title { font-size: 15.5px; font-weight: 700; margin-bottom: 7px; }
+  .gen-desc { font-size: 12.5px; color: #5E7385; margin-bottom: 16px; line-height: 1.55; }
+  .gen-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: var(--mist); color: var(--steel); border: none; border-radius: 9px; padding: 9px 15px; font-size: 13px; font-weight: 600; cursor: pointer; width: 100%; font-family: inherit; }
+  .warn-bar { background: #FBF1DE; border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 11px; font-size: 12px; color: #7A5B17; line-height: 1.5; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B1F33" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div>
+        <div class="logo-name">ComplyHub</div>
+        <div class="logo-sub">Conformité TET · PMI</div>
+      </div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="alert-box">
+      <div class="alert-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C99A3B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span>3 alertes actives</span>
+      </div>
+      <div class="alert-text">Permis de Patrick expire dans 90 jours. Information sur les droits manquante.</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+    <div class="header">
+      <div>
+        <h1 id="page-title">Tableau de bord</h1>
+        <p class="subtitle">Acadie Xpress Negocio · 11919644 Canada Inc.</p>
+      </div>
+      <div class="user-chip">
+        <div class="avatar">CC</div>
+        <span style="font-size:13.5px;font-weight:600;">Christian C.</span>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="tab active" id="tab-dashboard">
+      <div class="stats" id="stats"></div>
+      <div class="row">
+        <div class="card gauge-wrap">
+          <div class="gauge">
+            <svg width="130" height="130" style="transform:rotate(-90deg)">
+              <circle cx="65" cy="65" r="52" fill="none" stroke="var(--mist)" stroke-width="11"/>
+              <circle id="gauge-arc" cx="65" cy="65" r="52" fill="none" stroke="var(--amber)" stroke-width="11" stroke-linecap="round"/>
+            </svg>
+            <div class="gauge-text">
+              <div class="gauge-val" id="gauge-val">0%</div>
+              <div class="gauge-lbl">Prêt</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:16px;font-weight:700;margin-bottom:6px;">Préparation à l'inspection</div>
+            <p style="font-size:13px;color:#5E7385;line-height:1.6;max-width:280px;">Votre dossier est <b style="color:var(--amber)">presque prêt</b>. Corrigez l'information sur les droits manquante et vérifiez les écarts salariaux pour atteindre 100 %.</p>
+          </div>
+        </div>
+        <div class="card" style="flex:1;min-width:300px;">
+          <div class="card-title">Travailleurs étrangers</div>
+          <div id="workers-list"></div>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-head">
+          <div style="font-size:15px;font-weight:700;">Conditions de conformité réglementaire</div>
+          <div class="filters" id="filters"></div>
+        </div>
+        <div id="conditions-list"></div>
+      </div>
+    </div>
+
+    <!-- SIMULATOR -->
+    <div class="tab" id="tab-simulator" style="max-width:740px;">
+      <div class="sim-hero">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C99A3B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
+        <h2>Êtes-vous prêt pour une inspection ?</h2>
+        <p>Répondez honnêtement à ces questions reproduisant celles d'un inspecteur d'IRCC ou d'ESDC. ComplyHub identifiera vos points faibles avant une vraie inspection.</p>
+      </div>
+      <div id="sim-questions"></div>
+    </div>
+
+    <!-- VAULT -->
+    <div class="tab" id="tab-vault">
+      <div class="vault-grid" id="vault-grid"></div>
+      <div class="info-bar">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E6CA4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span><b>Conservation automatique :</b> tous les documents sont conservés pendant 6 ans, conformément à l'article R209.4 du RIPR.</span>
+      </div>
+    </div>
+
+    <!-- GENERATOR -->
+    <div class="tab" id="tab-generator">
+      <div class="gen-grid" id="gen-grid"></div>
+      <div class="warn-bar" style="grid-column:1/-1;margin-top:16px;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#E0A030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span><b>Avis :</b> ComplyHub est un outil de gestion et d'organisation documentaire. Il ne fournit pas de conseil juridique en immigration, lequel est réservé aux avocats et aux consultants réglementés (CICC).</span>
+      </div>
+    </div>
+  </main>
+
+<script>
+// ============ DONNÉES ============
+const CONDITIONS = [
+  {id:1, regime:'Commun', cat:'Emploi', label:"Emploi dans la même profession que l'offre", status:'ok'},
+  {id:2, regime:'Commun', cat:'Salaire', label:"Salaire substantiellement le même que l'offre", status:'warn'},
+  {id:3, regime:'Commun', cat:'Conditions', label:"Conditions de travail conformes à l'offre", status:'ok'},
+  {id:4, regime:'Commun', cat:'Légal', label:"Respect des lois fédérales et provinciales du travail", status:'ok'},
+  {id:5, regime:'Commun', cat:'Activité', label:"Activité commerciale conforme à l'offre d'emploi", status:'ok'},
+  {id:6, regime:'Commun', cat:'Documents', label:"Conservation des registres pendant 6 ans", status:'warn'},
+  {id:7, regime:'PMI', cat:'Abus', label:"Milieu de travail exempt d'abus (R196.2)", status:'ok'},
+  {id:8, regime:'PMI', cat:'Information', label:"Information sur les droits fournie au travailleur", status:'missing'},
+  {id:9, regime:'PMI', cat:'Santé', label:"Accès aux soins de santé en cas de blessure", status:'ok'},
+  {id:10, regime:'PTET', cat:'Logement', label:"Logement adéquat (si applicable)", status:'na'},
+  {id:11, regime:'Commun', cat:'Déclaration', label:"Déclaration des changements à l'autorité", status:'warn'},
+  {id:12, regime:'Commun', cat:'Coopération', label:"Coopération lors d'une inspection", status:'ok'},
+];
+const WORKERS = [
+  {name:'Charles R. Njonou', permit:'PMI', role:'Superviseur', score:92},
+  {name:'Patrick E. Imoisili', permit:'PMI', role:'Superviseur', score:78},
+  {name:'Nurudeen T. Ibrahim', permit:'PMI', role:'Superviseur', score:85},
+];
+const STATUS = {
+  ok:     {color:'#2E9E6B', bg:'#E6F4EC', label:'Conforme'},
+  warn:   {color:'#E0A030', bg:'#FBF1DE', label:'À vérifier'},
+  missing:{color:'#D1495B', bg:'#FAE5E8', label:'Manquant'},
+  na:     {color:'#8AA0B2', bg:'#EEF3F7', label:'N/A'},
+};
+const ICONS = {
+  ok:'<polyline points="20 6 9 17 4 12"/>',
+  warn:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  missing:'<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+  na:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+};
+const QUESTIONS = [
+  {q:"Pouvez-vous produire les registres de paie des 6 dernières années pour chaque travailleur ?", ref:"R209.4 — conservation des documents", crit:true},
+  {q:"Les salaires versés correspondent-ils à ceux de l'offre d'emploi ?", ref:"R209.2(1)(a)(iii) — salaire substantiellement le même", crit:true},
+  {q:"Avez-vous fourni au travailleur l'information sur ses droits au Canada ?", ref:"R209.2(1)(a.1) — depuis le 26 sept. 2022", crit:false},
+  {q:"Le travailleur occupe-t-il la même profession que dans l'offre ?", ref:"R209.2(1)(a)(iii) — même profession", crit:true},
+  {q:"Avez-vous une entente d'emploi signée par les deux parties ?", ref:"R209.11(1)(e) — entente conforme", crit:true},
+  {q:"Êtes-vous certain qu'aucuns frais n'ont été facturés au travailleur ?", ref:"R303.1(1) — interdiction des frais", crit:true},
+];
+const FOLDERS = [
+  {name:'Permis de travail', count:3, status:'ok', exp:'Plus proche : 9 août 2026'},
+  {name:"Offres d'emploi signées", count:3, status:'ok', exp:'Complet'},
+  {name:'Registres de paie', count:18, status:'warn', exp:'Vérifier mois manquants'},
+  {name:'Contrats de travail', count:3, status:'ok', exp:'Complet'},
+  {name:'Information sur les droits', count:0, status:'missing', exp:'Document requis manquant'},
+  {name:'Preuves de versements', count:12, status:'ok', exp:'À jour'},
+];
+const GENERATORS = [
+  {t:"Entente d'emploi conforme", d:"Génère un contrat conforme aux exigences du PMI/PTET (salaire, poste, conditions)."},
+  {t:"Réponse à un avis d'inspection", d:"Modèle structuré de justification sous l'article R209.2(3) du RIPR."},
+  {t:"Lettre de déclaration de changement", d:"Notifie un changement de conditions aux autorités avant qu'il prenne effet."},
+  {t:"Registre de conformité", d:"Document récapitulatif prêt à présenter lors d'une inspection."},
+];
+
+// ============ ICÔNES SVG ============
+function svg(paths, color, size=18) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+}
+const ICO = {
+  dashboard:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',
+  simulator:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/>',
+  vault:'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  generator:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/>',
+  check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  x:'<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  folder:'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+};
+
+// ============ NAVIGATION ============
+const NAV = [
+  {id:'dashboard', label:'Tableau de bord', icon:'dashboard'},
+  {id:'simulator', label:"Simulateur d'inspection", icon:'simulator'},
+  {id:'vault', label:'Coffre-fort documentaire', icon:'vault'},
+  {id:'generator', label:'Générateur de documents', icon:'generator'},
+];
+const navEl = document.getElementById('nav');
+NAV.forEach((n, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'nav-btn' + (i === 0 ? ' active' : '');
+  btn.innerHTML = svg(ICO[n.icon], 'currentColor') + n.label;
+  btn.onclick = () => switchTab(n.id, n.label, btn);
+  navEl.appendChild(btn);
+});
+function switchTab(id, label, btn) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  document.getElementById('page-title').textContent = label;
+}
+
+// ============ DASHBOARD ============
+const ok = CONDITIONS.filter(c => c.status === 'ok').length;
+const warn = CONDITIONS.filter(c => c.status === 'warn').length;
+const missing = CONDITIONS.filter(c => c.status === 'missing').length;
+const applicable = CONDITIONS.filter(c => c.status !== 'na').length;
+const score = Math.round((ok / applicable) * 100);
+
+const STAT_DATA = [
+  {icon:'users', val:3, label:'Travailleurs actifs', accent:'#2E6CA4'},
+  {icon:'check', val:ok, label:'Conditions conformes', accent:'#2E9E6B'},
+  {icon:'alert', val:warn, label:'À vérifier', accent:'#E0A030'},
+  {icon:'x', val:missing, label:'Éléments manquants', accent:'#D1495B'},
+];
+document.getElementById('stats').innerHTML = STAT_DATA.map(s => `
+  <div class="stat">
+    <div class="stat-icon" style="background:${s.accent}18">${svg(ICO[s.icon], s.accent)}</div>
+    <div class="stat-value">${s.val}</div>
+    <div class="stat-label">${s.label}</div>
+  </div>`).join('');
+
+// Gauge
+const r = 52, c = 2 * Math.PI * r;
+const arc = document.getElementById('gauge-arc');
+const gaugeColor = score >= 85 ? '#2E9E6B' : score >= 70 ? '#E0A030' : '#D1495B';
+arc.setAttribute('stroke', gaugeColor);
+arc.setAttribute('stroke-dasharray', c);
+arc.setAttribute('stroke-dashoffset', c - (score/100)*c);
+document.getElementById('gauge-val').textContent = score + '%';
+
+// Workers
+document.getElementById('workers-list').innerHTML = WORKERS.map(w => `
+  <div class="worker">
+    <div>
+      <div class="worker-name">${w.name}</div>
+      <div class="worker-role">${w.role} · Permis ${w.permit}</div>
+    </div>
+    <div class="worker-score" style="color:${w.score >= 85 ? '#2E9E6B' : '#E0A030'}">${w.score}%</div>
+  </div>`).join('');
+
+// Filters + conditions
+let currentFilter = 'Tous';
+const filtersEl = document.getElementById('filters');
+['Tous','PMI','PTET'].forEach(f => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn' + (f === 'Tous' ? ' active' : '');
+  btn.textContent = f;
+  btn.onclick = () => { currentFilter = f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderConditions(); };
+  filtersEl.appendChild(btn);
+});
+function renderConditions() {
+  const list = currentFilter === 'Tous' ? CONDITIONS : CONDITIONS.filter(c => c.regime === currentFilter || c.regime === 'Commun');
+  document.getElementById('conditions-list').innerHTML = list.map(cond => {
+    const s = STATUS[cond.status];
+    return `<div class="cond-row">
+      <div class="cond-icon" style="background:${s.bg}">${svg(ICONS[cond.status], s.color, 15)}</div>
+      <div style="flex:1">
+        <div class="cond-label">${cond.label}</div>
+        <div class="cond-cat">${cond.cat}</div>
+      </div>
+      <span class="badge">${cond.regime}</span>
+      <span class="status-text" style="color:${s.color}">${s.label}</span>
+    </div>`;
+  }).join('');
+}
+renderConditions();
+
+// ============ SIMULATOR ============
+document.getElementById('sim-questions').innerHTML = QUESTIONS.map((item, i) => `
+  <div class="q-card">
+    <div style="display:flex;gap:12px;">
+      <div class="q-num">${i+1}</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span class="q-text">${item.q}</span>
+          ${item.crit ? '<span style="font-size:9.5px;font-weight:700;color:#D1495B;background:#FAE5E8;padding:2px 7px;border-radius:10px;text-transform:uppercase;">Critique</span>' : ''}
+        </div>
+        <div class="q-ref">${item.ref}</div>
+        <div style="display:flex;gap:8px;">
+          <button class="ans-btn" style="background:#E6F4EC;color:#2E9E6B;" onclick="answer(this,'oui')">Oui</button>
+          <button class="ans-btn" style="background:#FBF1DE;color:#E0A030;" onclick="answer(this,'partiel')">Partiellement</button>
+          <button class="ans-btn" style="background:#FAE5E8;color:#D1495B;" onclick="answer(this,'non')">Non</button>
+        </div>
+      </div>
+    </div>
+  </div>`).join('');
+function answer(btn, val) {
+  const parent = btn.parentElement;
+  parent.querySelectorAll('.ans-btn').forEach(b => b.style.border = '2px solid transparent');
+  const colors = {oui:'#2E9E6B', partiel:'#E0A030', non:'#D1495B'};
+  btn.style.border = '2px solid ' + colors[val];
+}
+
+// ============ VAULT ============
+document.getElementById('vault-grid').innerHTML = FOLDERS.map(f => {
+  const s = STATUS[f.status];
+  return `<div class="folder">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+      <div style="background:var(--mist);border-radius:10px;padding:9px;display:flex;">${svg(ICO.folder,'#2E6CA4',19)}</div>
+      <div style="width:22px;height:22px;border-radius:7px;background:${s.bg};display:flex;align-items:center;justify-content:center;">${svg(ICONS[f.status], s.color, 13)}</div>
+    </div>
+    <div class="folder-name">${f.name}</div>
+    <div class="folder-count">${f.count} document${f.count > 1 ? 's' : ''}</div>
+    <div class="folder-status" style="color:${s.color}">${f.exp}</div>
+  </div>`;
+}).join('');
+
+// ============ GENERATOR ============
+document.getElementById('gen-grid').innerHTML = GENERATORS.map(g => `
+  <div class="gen-card">
+    <div class="gen-icon">${svg(ICO.generator,'#C99A3B',20)}</div>
+    <div class="gen-title">${g.t}</div>
+    <p class="gen-desc">${g.d}</p>
+    <button class="gen-btn">${svg(ICO.download,'#2E6CA4',15)} Générer le document</button>
+  </div>`).join('');
+</script>
+</body>
+</html>

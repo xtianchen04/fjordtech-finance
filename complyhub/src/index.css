@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+  h1,
+  h2,
+  .font-serif {
+    font-family: Georgia, Cambria, 'Times New Roman', serif;
+  }
+}
+
+@layer components {
+  /* Boutons de navigation (sidebar) */
+  .nav-btn {
+    @apply flex items-center gap-3 px-3.5 py-3 rounded-xl border-0 cursor-pointer text-left
+           bg-transparent text-[#A9C2D8] text-sm font-semibold transition-colors w-full;
+  }
+  .nav-btn:hover {
+    @apply bg-deep text-white;
+  }
+  .nav-btn.active {
+    @apply bg-steel text-white;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl p-5 border border-line;
+  }
+
+  .badge {
+    @apply text-[10.5px] font-bold text-steel bg-mist px-2.5 py-[3px] rounded-xl uppercase tracking-wide;
+  }
+
+  .filter-btn {
+    @apply px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer border border-line
+           bg-white text-[#5E7385];
+  }
+  .filter-btn.active {
+    @apply border-steel bg-steel text-white;
+  }
+
+  .field-label {
+    @apply block text-[12.5px] font-semibold text-[#5E7385] mb-1.5;
+  }
+  .field-input {
+    @apply w-full px-3.5 py-2.5 rounded-xl border border-line bg-paper text-sm text-ink
+           outline-none focus:border-steel focus:ring-2 focus:ring-steel/15 transition;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-ink text-white font-semibold
+           text-sm px-5 py-2.5 rounded-xl cursor-pointer hover:bg-deep transition disabled:opacity-60;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 bg-gold text-ink font-semibold
+           text-sm px-5 py-2.5 rounded-xl cursor-pointer hover:brightness-95 transition disabled:opacity-60;
+  }
+}
