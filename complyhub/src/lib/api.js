@@ -169,3 +169,174 @@ export function computeReadinessScore(complianceRows) {
   const ok = applicable.filter((r) => r.status === 'ok').length
   return Math.round((ok / applicable.length) * 100)
 }
+
+// ---------- Coffre-fort documentaire (Supabase Storage) ----------
+
+const DOCUMENTS_BUCKET = 'documents'
+
+/** Liste les documents d'une organisation. */
+export async function getDocuments(orgId) {
+  const { data, error } = await supabase
+    .from('documents')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('uploaded_at', { ascending: false })
+
+  if (error) throw error
+  return data ?? []
+}
+
+/**
+ * Téléverse un fichier dans le bucket privé puis enregistre ses métadonnées.
+ * Chemin : <org_id>/<worker_id|general>/<timestamp>-<nom>  (cohérent avec les RLS Storage).
+ * La conservation est fixée à 6 ans (R209.4).
+ */
+export async function uploadDocument(orgId, { file, category, workerId = null }) {
+  const safeName = file.name.replace(/[^\w.\-]+/g, '_')
+  const scope = workerId ?? 'general'
+  const storagePath = `${orgId}/${scope}/${Date.now()}-${safeName}`
+
+  const { error: upErr } = await supabase.storage
+    .from(DOCUMENTS_BUCKET)
+    .upload(storagePath, file, { upsert: false })
+  if (upErr) throw upErr
+
+  const retention = new Date()
+  retention.setFullYear(retention.getFullYear() + 6)
+
+  const { data, error } = await supabase
+    .from('documents')
+    .insert({
+      org_id: orgId,
+      worker_id: workerId,
+      category,
+      file_name: file.name,
+      storage_path: storagePath,
+      retention_until: retention.toISOString().slice(0, 10),
+    })
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+/** Génère une URL signée temporaire pour télécharger / visualiser un document. */
+export async function getDocumentUrl(storagePath, expiresIn = 3600) {
+  const { data, error } = await supabase.storage
+    .from(DOCUMENTS_BUCKET)
+    .createSignedUrl(storagePath, expiresIn)
+  if (error) throw error
+  return data.signedUrl
+}
+
+/** Supprime un document (fichier + métadonnées). */
+export async function deleteDocument(doc) {
+  const { error: rmErr } = await supabase.storage
+    .from(DOCUMENTS_BUCKET)
+    .remove([doc.storage_path])
+  if (rmErr) throw rmErr
+
+  const { error } = await supabase.from('documents').delete().eq('id', doc.id)
+  if (error) throw error
+}
+
+// ---------- Simulateur d'inspection ----------
+
+/** Enregistre un résultat de simulation. */
+export async function saveSimulation(orgId, { score, answers }) {
+  const user = await getCurrentUser()
+  if (!user) throw new Error('Aucun utilisateur connecté.')
+
+  const { data, error } = await supabase
+    .from('inspection_simulations')
+    .insert({ org_id: orgId, score, answers, created_by: user.id })
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+/** Historique des simulations d'une organisation. */
+export async function getSimulations(orgId) {
+  const { data, error } = await supabase
+    .from('inspection_simulations')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data ?? []
+}
+
+// ---------- Alertes (calculées côté client) ----------
+
+/**
+ * Dérive la liste des alertes à partir des travailleurs et de leur conformité.
+ * @param {Array} workers
+ * @param {Object<string, Array>} complianceByWorker  workerId -> lignes de conformité
+ * @param {number} permitWindowDays  fenêtre d'alerte avant expiration (défaut 90 j)
+ */
+export function computeAlerts(workers, complianceByWorker, permitWindowDays = 90) {
+  const alerts = []
+  const today = new Date()
+
+  for (const w of workers) {
+    // Permis qui expire bientôt / expiré.
+    if (w.permit_expiry) {
+      const exp = new Date(w.permit_expiry)
+      const days = Math.ceil((exp - today) / (1000 * 60 * 60 * 24))
+      if (days < 0) {
+        alerts.push({
+          id: `permit-${w.id}`,
+          severity: 'missing',
+          title: `Permis expiré — ${w.full_name}`,
+          detail: `Le permis de travail a expiré il y a ${Math.abs(days)} jour(s).`,
+        })
+      } else if (days <= permitWindowDays) {
+        alerts.push({
+          id: `permit-${w.id}`,
+          severity: 'warn',
+          title: `Permis bientôt expiré — ${w.full_name}`,
+          detail: `Le permis de travail expire dans ${days} jour(s).`,
+        })
+      }
+    }
+
+    // Conditions manquantes.
+    const rows = complianceByWorker[w.id] ?? []
+    const missing = rows.filter((r) => r.status === 'missing')
+    for (const r of missing) {
+      alerts.push({
+        id: `cond-${r.id}`,
+        severity: 'missing',
+        title: `Condition manquante — ${w.full_name}`,
+        detail: r.condition?.label ?? 'Condition de conformité non satisfaite.',
+      })
+    }
+  }
+
+  // Les éléments manquants d'abord, puis les avertissements.
+  const rank = { missing: 0, warn: 1 }
+  return alerts.sort((a, b) => rank[a.severity] - rank[b.severity])
+}
+
+// ---------- Facturation (Stripe via fonction Edge Supabase) ----------
+
+/**
+ * Démarre une session de paiement Stripe Checkout.
+ * Nécessite la fonction Edge « create-checkout » déployée (voir supabase/functions/).
+ * Redirige le navigateur vers l'URL de paiement renvoyée.
+ */
+export async function startCheckout(plan) {
+  const { data, error } = await supabase.functions.invoke('create-checkout', {
+    body: { plan, origin: window.location.origin },
+  })
+  if (error) throw error
+  if (data?.url) {
+    window.location.href = data.url
+  } else {
+    throw new Error('URL de paiement introuvable. Vérifiez la fonction Edge create-checkout.')
+  }
+}

@@ -61,15 +61,24 @@ complyhub/
     │   ├── supabase.js             ← client + helpers auth (onAuthChange, signIn…)
     │   ├── api.js                  ← couche d'accès aux données (organizations, workers…)
     │   └── constants.js            ← STATUS, provinces, questions, dossiers…
+    │   └── generators.js           ← génération de documents imprimables
     └── components/
+        ├── Landing.jsx             ← page d'accueil publique
         ├── Auth.jsx                ← connexion / inscription
         ├── Onboarding.jsx          ← création de l'organisation
         ├── ComplyHub.jsx           ← coquille + tableau de bord (données réelles)
         ├── WorkerForm.jsx          ← modal d'ajout d'un travailleur
+        ├── WorkerDetail.jsx        ← modal d'édition de la conformité d'un travailleur
         ├── Gauge.jsx               ← jauge de score SVG
-        ├── Simulator.jsx           ← simulateur d'inspection
-        ├── Vault.jsx               ← coffre-fort documentaire
-        └── Generator.jsx           ← générateur de documents
+        ├── Alerts.jsx              ← vue des alertes
+        ├── Simulator.jsx           ← simulateur d'inspection (sauvegardé)
+        ├── Vault.jsx               ← coffre-fort documentaire (Supabase Storage)
+        ├── Generator.jsx           ← générateur de documents
+        └── Billing.jsx             ← abonnement / Stripe
+
+supabase/functions/
+├── create-checkout/index.ts        ← session Stripe Checkout
+└── stripe-webhook/index.ts         ← met à jour subscription_tier
 ```
 
 ## Modèle de données

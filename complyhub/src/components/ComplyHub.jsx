@@ -5,40 +5,47 @@ import {
   FileCheck,
   Lock,
   FileText,
+  Bell,
+  CreditCard,
   Users,
   Check,
   AlertTriangle,
   XCircle,
   Clock,
-  Bell,
   Plus,
   Loader2,
   LogOut,
+  ChevronRight,
 } from 'lucide-react'
 import { signOut, getCurrentUser } from '../lib/supabase'
 import {
   getWorkers,
   getConditions,
   getWorkerCompliance,
+  getDocuments,
   computeReadinessScore,
+  computeAlerts,
 } from '../lib/api'
 import { STATUS } from '../lib/constants'
 import Gauge from './Gauge'
 import Simulator from './Simulator'
 import Vault from './Vault'
 import Generator from './Generator'
+import Alerts from './Alerts'
+import Billing from './Billing'
 import WorkerForm from './WorkerForm'
+import WorkerDetail from './WorkerDetail'
 
 const NAV = [
   { id: 'dashboard', label: 'Tableau de bord', Icon: LayoutDashboard },
+  { id: 'alerts', label: 'Alertes', Icon: Bell },
   { id: 'simulator', label: "Simulateur d'inspection", Icon: FileCheck },
   { id: 'vault', label: 'Coffre-fort documentaire', Icon: Lock },
   { id: 'generator', label: 'Générateur de documents', Icon: FileText },
+  { id: 'billing', label: 'Abonnement', Icon: CreditCard },
 ]
 
 const STATUS_ICON = { ok: Check, warn: AlertTriangle, pending: AlertTriangle, missing: XCircle, na: Clock }
-
-// Statut « le pire d'abord » pour agréger plusieurs travailleurs sur une même condition.
 const STATUS_RANK = { missing: 0, warn: 1, pending: 1, ok: 2, na: 3 }
 
 function initials(text = '') {
@@ -56,19 +63,25 @@ export default function ComplyHub({ org, user }) {
   const [error, setError] = useState('')
   const [workers, setWorkers] = useState([])
   const [conditions, setConditions] = useState([])
-  // Map workerId -> lignes de conformité (avec condition jointe).
   const [complianceByWorker, setComplianceByWorker] = useState({})
+  const [documents, setDocuments] = useState([])
   const [filter, setFilter] = useState('Tous')
   const [showWorkerForm, setShowWorkerForm] = useState(false)
+  const [detailWorker, setDetailWorker] = useState(null)
   const [me, setMe] = useState(user ?? null)
 
   async function loadData() {
     setLoading(true)
     setError('')
     try {
-      const [ws, conds] = await Promise.all([getWorkers(org.id), getConditions()])
+      const [ws, conds, docs] = await Promise.all([
+        getWorkers(org.id),
+        getConditions(),
+        getDocuments(org.id).catch(() => []),
+      ])
       setWorkers(ws)
       setConditions(conds)
+      setDocuments(docs)
 
       const entries = await Promise.all(
         ws.map(async (w) => [w.id, await getWorkerCompliance(w.id)]),
@@ -81,13 +94,24 @@ export default function ComplyHub({ org, user }) {
     }
   }
 
+  // Recharge uniquement la conformité (après édition d'un statut), sans plein écran de chargement.
+  async function reloadCompliance() {
+    const entries = await Promise.all(
+      workers.map(async (w) => [w.id, await getWorkerCompliance(w.id)]),
+    )
+    setComplianceByWorker(Object.fromEntries(entries))
+  }
+
+  async function reloadDocuments() {
+    setDocuments(await getDocuments(org.id).catch(() => []))
+  }
+
   useEffect(() => {
     loadData()
     if (!me) getCurrentUser().then(setMe)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [org.id])
 
-  // Toutes les lignes de conformité, tous travailleurs confondus.
   const allCompliance = useMemo(
     () => Object.values(complianceByWorker).flat(),
     [complianceByWorker],
@@ -95,16 +119,17 @@ export default function ComplyHub({ org, user }) {
 
   const score = useMemo(() => computeReadinessScore(allCompliance), [allCompliance])
 
-  // Score par travailleur.
   const workerScores = useMemo(() => {
     const map = {}
-    for (const w of workers) {
-      map[w.id] = computeReadinessScore(complianceByWorker[w.id] ?? [])
-    }
+    for (const w of workers) map[w.id] = computeReadinessScore(complianceByWorker[w.id] ?? [])
     return map
   }, [workers, complianceByWorker])
 
-  // Agrégation par condition (statut « le pire d'abord ») pour le tableau du tableau de bord.
+  const alerts = useMemo(
+    () => computeAlerts(workers, complianceByWorker),
+    [workers, complianceByWorker],
+  )
+
   const aggregatedConditions = useMemo(() => {
     return conditions.map((cond) => {
       const rows = allCompliance.filter((r) => r.condition_id === cond.id)
@@ -165,22 +190,28 @@ export default function ComplyHub({ org, user }) {
               className={`nav-btn ${tab === id ? 'active' : ''}`}
               onClick={() => setTab(id)}
             >
-              <Icon size={18} /> {label}
+              <Icon size={18} /> <span className="flex-1">{label}</span>
+              {id === 'alerts' && alerts.length > 0 && (
+                <span className="bg-danger text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  {alerts.length}
+                </span>
+              )}
             </button>
           ))}
         </nav>
 
-        <div className="mt-auto bg-deep rounded-2xl p-4">
+        <button
+          onClick={() => setTab('alerts')}
+          className="mt-auto bg-deep rounded-2xl p-4 text-left hover:brightness-110 transition"
+        >
           <div className="flex items-center gap-2 mb-2 text-xs font-bold">
             <Bell size={15} className="text-gold" />
-            <span>Alertes</span>
+            <span>{alerts.length} alerte(s) active(s)</span>
           </div>
           <div className="text-[11.5px] text-[#9FB8CE] leading-relaxed">
-            {counts.missing > 0
-              ? `${counts.missing} élément(s) manquant(s) à corriger avant une inspection.`
-              : 'Aucune alerte critique. Continuez le suivi de vos conditions.'}
+            {alerts[0]?.detail ?? 'Aucune alerte critique. Continuez le suivi de vos conditions.'}
           </div>
-        </div>
+        </button>
       </aside>
 
       {/* MAIN */}
@@ -202,20 +233,14 @@ export default function ComplyHub({ org, user }) {
                 {me?.email ?? 'Mon compte'}
               </span>
             </div>
-            <button
-              onClick={() => signOut()}
-              className="text-[#7A8FA0] hover:text-ink"
-              title="Se déconnecter"
-            >
+            <button onClick={() => signOut()} className="text-[#7A8FA0] hover:text-ink" title="Se déconnecter">
               <LogOut size={18} />
             </button>
           </div>
         </div>
 
         {error && (
-          <div className="mb-5 text-[12.5px] bg-[#FAE5E8] text-danger rounded-xl px-4 py-3">
-            {error}
-          </div>
+          <div className="mb-5 text-[12.5px] bg-[#FAE5E8] text-danger rounded-xl px-4 py-3">{error}</div>
         )}
 
         {loading ? (
@@ -234,20 +259,35 @@ export default function ComplyHub({ org, user }) {
                 filter={filter}
                 setFilter={setFilter}
                 onAddWorker={() => setShowWorkerForm(true)}
+                onOpenWorker={setDetailWorker}
               />
             )}
-            {tab === 'simulator' && <Simulator />}
-            {tab === 'vault' && <Vault />}
-            {tab === 'generator' && <Generator />}
+            {tab === 'alerts' && <Alerts alerts={alerts} />}
+            {tab === 'simulator' && <Simulator orgId={org.id} />}
+            {tab === 'vault' && (
+              <Vault orgId={org.id} documents={documents} workers={workers} onChange={reloadDocuments} />
+            )}
+            {tab === 'generator' && (
+              <Generator
+                org={org}
+                workers={workers}
+                complianceByWorker={complianceByWorker}
+                score={score}
+              />
+            )}
+            {tab === 'billing' && <Billing org={org} />}
           </>
         )}
       </main>
 
       {showWorkerForm && (
-        <WorkerForm
-          orgId={org.id}
-          onClose={() => setShowWorkerForm(false)}
-          onCreated={loadData}
+        <WorkerForm orgId={org.id} onClose={() => setShowWorkerForm(false)} onCreated={loadData} />
+      )}
+      {detailWorker && (
+        <WorkerDetail
+          worker={detailWorker}
+          onClose={() => setDetailWorker(null)}
+          onChange={reloadCompliance}
         />
       )}
     </div>
@@ -255,8 +295,17 @@ export default function ComplyHub({ org, user }) {
 }
 
 // ---------- Onglet Tableau de bord ----------
-function DashboardTab({ stats, score, workers, workerScores, conditions, filter, setFilter, onAddWorker }) {
-  // État vide : aucun travailleur.
+function DashboardTab({
+  stats,
+  score,
+  workers,
+  workerScores,
+  conditions,
+  filter,
+  setFilter,
+  onAddWorker,
+  onOpenWorker,
+}) {
   if (workers.length === 0) {
     return (
       <div className="card flex flex-col items-center justify-center text-center py-16">
@@ -277,7 +326,6 @@ function DashboardTab({ stats, score, workers, workerScores, conditions, filter,
 
   return (
     <>
-      {/* Statistiques */}
       <div className="flex gap-4 mb-6 flex-wrap">
         {stats.map((s) => (
           <div key={s.label} className="bg-white rounded-2xl px-5 py-4 border border-line flex-1 min-w-[150px]">
@@ -290,7 +338,6 @@ function DashboardTab({ stats, score, workers, workerScores, conditions, filter,
         ))}
       </div>
 
-      {/* Jauge + travailleurs */}
       <div className="flex gap-4 mb-6 flex-wrap">
         <div className="card flex items-center gap-6 flex-1 min-w-[300px]">
           <Gauge score={score} />
@@ -317,9 +364,10 @@ function DashboardTab({ stats, score, workers, workerScores, conditions, filter,
             {workers.map((w) => {
               const sc = workerScores[w.id] ?? 0
               return (
-                <div
+                <button
                   key={w.id}
-                  className="flex items-center justify-between py-2.5 border-b border-mist last:border-0"
+                  onClick={() => onOpenWorker(w)}
+                  className="w-full flex items-center justify-between py-2.5 border-b border-mist last:border-0 text-left hover:bg-paper -mx-2 px-2 rounded-lg transition"
                 >
                   <div>
                     <div className="text-[13.5px] font-semibold">{w.full_name}</div>
@@ -327,20 +375,22 @@ function DashboardTab({ stats, score, workers, workerScores, conditions, filter,
                       {w.occupation ?? 'Travailleur'} · {w.program}
                     </div>
                   </div>
-                  <div
-                    className="font-bold text-sm"
-                    style={{ color: sc >= 85 ? '#2E9E6B' : sc >= 70 ? '#E0A030' : '#D1495B' }}
-                  >
-                    {sc}%
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="font-bold text-sm"
+                      style={{ color: sc >= 85 ? '#2E9E6B' : sc >= 70 ? '#E0A030' : '#D1495B' }}
+                    >
+                      {sc}%
+                    </span>
+                    <ChevronRight size={15} className="text-[#9FB0BF]" />
                   </div>
-                </div>
+                </button>
               )
             })}
           </div>
         </div>
       </div>
 
-      {/* Tableau des conditions */}
       <div className="card p-0 overflow-hidden">
         <div className="flex justify-between items-center px-5 py-4 border-b border-line flex-wrap gap-3">
           <div className="text-[15px] font-bold">Conditions de conformité réglementaire</div>
@@ -361,10 +411,7 @@ function DashboardTab({ stats, score, workers, workerScores, conditions, filter,
             const s = STATUS[cond.status] ?? STATUS.pending
             const Icon = STATUS_ICON[cond.status] ?? AlertTriangle
             return (
-              <div
-                key={cond.id}
-                className="flex items-center gap-3.5 px-5 py-3 border-b border-mist last:border-0"
-              >
+              <div key={cond.id} className="flex items-center gap-3.5 px-5 py-3 border-b border-mist last:border-0">
                 <div
                   className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{ background: s.bg }}
@@ -376,10 +423,7 @@ function DashboardTab({ stats, score, workers, workerScores, conditions, filter,
                   <div className="text-[11px] text-[#9FB0BF] mt-px">{cond.category}</div>
                 </div>
                 <span className="badge">{cond.regime}</span>
-                <span
-                  className="text-xs font-bold min-w-[78px] text-right"
-                  style={{ color: s.color }}
-                >
+                <span className="text-xs font-bold min-w-[78px] text-right" style={{ color: s.color }}>
                   {s.label}
                 </span>
               </div>

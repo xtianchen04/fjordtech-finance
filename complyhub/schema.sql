@@ -94,14 +94,29 @@ create table if not exists public.documents (
 
 create index if not exists idx_documents_org_id on public.documents (org_id);
 
+-- ------------------------------------------------------------
+-- 6) INSPECTION_SIMULATIONS (résultats sauvegardés du simulateur)
+-- ------------------------------------------------------------
+create table if not exists public.inspection_simulations (
+  id         uuid primary key default gen_random_uuid(),
+  org_id     uuid not null references public.organizations (id) on delete cascade,
+  score      integer not null default 0,
+  answers    jsonb not null default '{}'::jsonb,
+  created_by uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_simulations_org_id on public.inspection_simulations (org_id);
+
 -- ============================================================
 --  ROW LEVEL SECURITY
 -- ============================================================
-alter table public.organizations       enable row level security;
-alter table public.workers             enable row level security;
+alter table public.organizations         enable row level security;
+alter table public.workers               enable row level security;
 alter table public.compliance_conditions enable row level security;
-alter table public.worker_compliance   enable row level security;
-alter table public.documents           enable row level security;
+alter table public.worker_compliance     enable row level security;
+alter table public.documents             enable row level security;
+alter table public.inspection_simulations enable row level security;
 
 -- ---------- organizations : l'utilisateur ne voit que les siennes ----------
 drop policy if exists "org_select_own"  on public.organizations;
@@ -156,6 +171,17 @@ create policy "wc_all_own" on public.worker_compliance
 -- ---------- documents : via l'organisation ----------
 drop policy if exists "documents_all_own" on public.documents;
 create policy "documents_all_own" on public.documents
+  for all
+  using (
+    org_id in (select id from public.organizations where created_by = auth.uid())
+  )
+  with check (
+    org_id in (select id from public.organizations where created_by = auth.uid())
+  );
+
+-- ---------- inspection_simulations : via l'organisation ----------
+drop policy if exists "simulations_all_own" on public.inspection_simulations;
+create policy "simulations_all_own" on public.inspection_simulations
   for all
   using (
     org_id in (select id from public.organizations where created_by = auth.uid())

@@ -62,10 +62,35 @@ automatiquement et le score de préparation est recalculé.
 
 ## Modules
 
-- **Tableau de bord** — score de préparation, statistiques, liste des travailleurs, conditions agrégées.
-- **Simulateur d'inspection** — questions types d'un inspecteur IRCC/ESDC.
-- **Coffre-fort documentaire** — dossiers par catégorie (Supabase Storage).
-- **Générateur de documents** — modèles conformes.
+- **Tableau de bord** — score de préparation, statistiques, liste des travailleurs (cliquables pour éditer leur conformité), conditions agrégées.
+- **Alertes** — permis qui expirent (≤ 90 j) et conditions manquantes, calculées automatiquement.
+- **Simulateur d'inspection** — questions types d'un inspecteur IRCC/ESDC, résultat calculé et **sauvegardé** (historique).
+- **Coffre-fort documentaire** — upload / téléchargement / suppression réels via **Supabase Storage**, conservation 6 ans.
+- **Générateur de documents** — documents imprimables (PDF) remplis avec vos données réelles.
+- **Abonnement** — paliers et paiement via **Stripe Checkout**.
+
+## Facturation (Stripe) — optionnel
+
+La facturation s'appuie sur deux fonctions Edge Supabase (`supabase/functions/`).
+
+1. Créez vos produits/prix dans Stripe (plans Pro et Cabinet) et notez les `price_...`.
+2. Définissez les secrets :
+   ```bash
+   supabase secrets set STRIPE_SECRET_KEY=sk_...
+   supabase secrets set STRIPE_PRICE_PRO=price_...
+   supabase secrets set STRIPE_PRICE_CABINET=price_...
+   supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_...
+   ```
+3. Déployez :
+   ```bash
+   supabase functions deploy create-checkout
+   supabase functions deploy stripe-webhook --no-verify-jwt
+   ```
+4. Dans Stripe → Developers → Webhooks, ajoutez l'endpoint
+   `https://<projet>.supabase.co/functions/v1/stripe-webhook` (événement `checkout.session.completed`).
+
+Sans cette configuration, l'app fonctionne normalement ; seul le bouton de paiement
+affichera une erreur explicite.
 
 ## Structure
 

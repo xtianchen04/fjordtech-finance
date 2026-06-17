@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { onAuthChange, getCurrentUser } from './lib/supabase'
 import { getMyOrganization } from './lib/api'
+import Landing from './components/Landing'
 import Auth from './components/Auth'
 import Onboarding from './components/Onboarding'
 import ComplyHub from './components/ComplyHub'
@@ -12,6 +13,7 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
   const [org, setOrg] = useState(null)
+  const [showAuth, setShowAuth] = useState(false) // bascule Landing → Auth
 
   // Charge l'organisation de l'utilisateur courant (si connecté).
   async function refreshOrg() {
@@ -59,7 +61,9 @@ export default function App() {
     )
   }
 
-  if (!user) return <Auth />
+  if (!user) {
+    return showAuth ? <Auth /> : <Landing onStart={() => setShowAuth(true)} />
+  }
   if (!org) return <Onboarding onCreated={(o) => setOrg(o)} />
   return <ComplyHub org={org} user={user} />
 }

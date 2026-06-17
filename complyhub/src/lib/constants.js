@@ -74,19 +74,61 @@ export const VAULT_FOLDERS = [
 // Modèles disponibles dans le générateur de documents.
 export const GENERATORS = [
   {
+    key: 'entente',
     t: "Entente d'emploi conforme",
     d: "Génère un contrat conforme aux exigences du PMI/PTET (salaire, poste, conditions).",
+    needsWorker: true,
   },
   {
+    key: 'reponse',
     t: "Réponse à un avis d'inspection",
     d: "Modèle structuré de justification sous l'article R209.2(3) du RIPR.",
+    needsWorker: false,
   },
   {
+    key: 'declaration',
     t: 'Lettre de déclaration de changement',
     d: 'Notifie un changement de conditions aux autorités avant qu\'il prenne effet.',
+    needsWorker: false,
   },
   {
+    key: 'registre',
     t: 'Registre de conformité',
     d: 'Document récapitulatif prêt à présenter lors d\'une inspection.',
+    needsWorker: false,
+  },
+]
+
+// Paliers d'abonnement (facturation).
+export const PLANS = [
+  {
+    id: 'free',
+    name: 'Gratuit',
+    price: '0 $',
+    period: '',
+    features: ['1 travailleur', 'Tableau de bord', 'Simulateur d\'inspection'],
+    cta: 'Plan actuel',
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: '49 $',
+    period: '/ mois',
+    features: [
+      'Travailleurs illimités',
+      'Coffre-fort documentaire',
+      'Générateur de documents',
+      'Alertes automatiques',
+    ],
+    cta: 'Passer à Pro',
+    featured: true,
+  },
+  {
+    id: 'cabinet',
+    name: 'Cabinet',
+    price: '149 $',
+    period: '/ mois',
+    features: ['Multi-organisations', 'Accès consultant (CICC)', 'Support prioritaire'],
+    cta: 'Contacter les ventes',
   },
 ]
