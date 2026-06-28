@@ -7,6 +7,7 @@ import {
   FileText,
   Bell,
   CreditCard,
+  Newspaper,
   Users,
   Check,
   AlertTriangle,
@@ -33,12 +34,14 @@ import Vault from './Vault'
 import Generator from './Generator'
 import Alerts from './Alerts'
 import Billing from './Billing'
+import RegulatoryUpdates from './RegulatoryUpdates'
 import WorkerForm from './WorkerForm'
 import WorkerDetail from './WorkerDetail'
 
 const NAV = [
   { id: 'dashboard', label: 'Tableau de bord', Icon: LayoutDashboard },
   { id: 'alerts', label: 'Alertes', Icon: Bell },
+  { id: 'updates', label: 'Veille réglementaire', Icon: Newspaper },
   { id: 'simulator', label: "Simulateur d'inspection", Icon: FileCheck },
   { id: 'vault', label: 'Coffre-fort documentaire', Icon: Lock },
   { id: 'generator', label: 'Générateur de documents', Icon: FileText },
@@ -273,6 +276,7 @@ export default function ComplyHub({ org, user, demo = false }) {
               />
             )}
             {tab === 'alerts' && <Alerts alerts={alerts} />}
+            {tab === 'updates' && <RegulatoryUpdates org={org} />}
             {tab === 'simulator' && <Simulator orgId={org.id} />}
             {tab === 'vault' && (
               <Vault orgId={org.id} documents={documents} workers={workers} onChange={reloadDocuments} />
