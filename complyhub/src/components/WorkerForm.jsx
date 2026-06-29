@@ -11,6 +11,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
     program: 'PMI',
     occupation: '',
     work_permit_number: '',
+    social_insurance_number: '',
     permit_expiry: '',
     offered_wage: '',
     offered_hours: '',
@@ -109,6 +110,20 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
                 value={form.work_permit_number}
                 onChange={(e) => update('work_permit_number', e.target.value)}
                 placeholder="UCI / permis"
+              />
+            </div>
+            <div>
+              <label className="field-label" htmlFor="social_insurance_number">
+                NAS (Numéro d'assurance sociale)
+              </label>
+              <input
+                id="social_insurance_number"
+                inputMode="numeric"
+                autoComplete="off"
+                className="field-input"
+                value={form.social_insurance_number}
+                onChange={(e) => update('social_insurance_number', e.target.value)}
+                placeholder="9XX XXX XXX"
               />
             </div>
             <div>

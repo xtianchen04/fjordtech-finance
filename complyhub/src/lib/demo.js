@@ -106,6 +106,7 @@ export const demoStore = {
       program: payload.program ?? 'PMI',
       occupation: payload.occupation ?? null,
       work_permit_number: payload.work_permit_number ?? null,
+      social_insurance_number: payload.social_insurance_number || null,
       permit_expiry: payload.permit_expiry || null,
       offered_wage: payload.offered_wage ? Number(payload.offered_wage) : null,
       offered_hours: payload.offered_hours ? Number(payload.offered_hours) : null,
