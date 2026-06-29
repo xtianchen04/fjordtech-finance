@@ -1,5 +1,6 @@
 import { supabase, getCurrentUser } from './supabase'
 import { isDemo, demoStore } from './demo'
+import { normalizeNAS } from './nas'
 
 // ============================================================
 //  Couche d'accès aux données ComplyHub (Supabase / PostgREST)
@@ -31,6 +32,65 @@ export async function createOrganization(payload) {
 
   if (error) throw error
   return data
+}
+
+/**
+ * Met à jour l'organisation de l'utilisateur (nom, coordonnées, province,
+ * préférences de notification). Seuls les champs fournis sont modifiés.
+ * @param {string} orgId
+ * @param {Object} patch  champs autorisés : name, legal_name, business_number,
+ *   address, province, notify_enabled, notify_email, alert_window_days
+ */
+export async function updateOrganization(orgId, patch) {
+  if (isDemo()) return demoStore.updateOrganization(orgId, patch)
+
+  const pick = (keys) =>
+    Object.fromEntries(keys.filter((k) => k in patch).map((k) => [k, patch[k]]))
+
+  // Champs de base : colonnes toujours présentes dans le schéma.
+  const core = pick(['name', 'legal_name', 'business_number', 'address', 'province'])
+  // Préférences de notification : colonnes ajoutées par migration (peuvent être absentes).
+  const notif = pick(['notify_enabled', 'notify_email', 'alert_window_days'])
+
+  let result = null
+
+  if (Object.keys(core).length) {
+    const { data, error } = await supabase
+      .from('organizations')
+      .update(core)
+      .eq('id', orgId)
+      .select()
+      .single()
+    if (error) throw error
+    result = data
+  }
+
+  if (Object.keys(notif).length) {
+    const { data, error } = await supabase
+      .from('organizations')
+      .update(notif)
+      .eq('id', orgId)
+      .select()
+      .single()
+    if (error) {
+      // Migration des préférences non appliquée : on ignore plutôt que de tout faire échouer.
+      const benign = /column|notify_|alert_window|does not exist|schema cache/i.test(error.message ?? '')
+      if (!benign) throw error
+    } else {
+      result = data
+    }
+  }
+
+  if (!result) {
+    const { data, error } = await supabase
+      .from('organizations')
+      .select('*')
+      .eq('id', orgId)
+      .single()
+    if (error) throw error
+    result = data
+  }
+  return result
 }
 
 /** Récupère l'organisation de l'utilisateur connecté (ou null s'il n'en a pas encore). */
@@ -80,7 +140,7 @@ export async function createWorker(orgId, payload) {
       program: payload.program ?? 'PMI',
       occupation: payload.occupation ?? null,
       work_permit_number: payload.work_permit_number ?? null,
-      social_insurance_number: payload.social_insurance_number || null,
+      social_insurance_number: normalizeNAS(payload.social_insurance_number) || null,
       permit_expiry: payload.permit_expiry || null,
       offered_wage: payload.offered_wage ? Number(payload.offered_wage) : null,
       offered_hours: payload.offered_hours ? Number(payload.offered_hours) : null,
