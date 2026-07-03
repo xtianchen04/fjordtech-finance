@@ -7,6 +7,7 @@ import Landing from './components/Landing'
 import Auth from './components/Auth'
 import Onboarding from './components/Onboarding'
 import ComplyHub from './components/ComplyHub'
+import EmployeePortal from './components/employee/EmployeePortal'
 
 // Flux applicatif :
 //   non connecté → <Auth /> → (pas d'org) → <Onboarding /> → <ComplyHub />
@@ -16,6 +17,13 @@ export default function App() {
   const [org, setOrg] = useState(null)
   const [showAuth, setShowAuth] = useState(false) // bascule Landing → Auth
   const [demo, setDemo] = useState(false) // mode démo (sans Supabase)
+  const [hash, setHash] = useState(() => window.location.hash) // routage simple par ancre
+
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash)
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
 
   function startDemo() {
     enableDemo()
@@ -59,6 +67,9 @@ export default function App() {
       unsubscribe()
     }
   }, [])
+
+  // Aperçu du portail employé (maquette), indépendant du flux d'authentification.
+  if (hash === '#/employe') return <EmployeePortal />
 
   if (loading) {
     return (

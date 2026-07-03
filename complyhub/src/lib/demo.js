@@ -6,6 +6,8 @@
 //  pour la durée de la session (rechargement = réinitialisation).
 // ============================================================
 
+import { normalizeNAS } from './nas'
+
 let DEMO = false
 export function enableDemo() {
   DEMO = true
@@ -26,6 +28,9 @@ export const DEMO_ORG = {
   address: '123 rue Principale, Moncton, NB',
   province: 'NB',
   subscription_tier: 'free',
+  notify_enabled: false,
+  notify_email: 'demo@complyhub.ca',
+  alert_window_days: 90,
   created_by: DEMO_USER.id,
 }
 
@@ -89,6 +94,11 @@ export const demoStore = {
   async getMyOrganization() {
     return DEMO_ORG
   },
+  async updateOrganization(orgId, patch) {
+    // Mutation en mémoire de l'organisation de démo.
+    Object.assign(DEMO_ORG, patch)
+    return { ...DEMO_ORG }
+  },
   async getWorkers() {
     return [...workers]
   },
@@ -106,7 +116,7 @@ export const demoStore = {
       program: payload.program ?? 'PMI',
       occupation: payload.occupation ?? null,
       work_permit_number: payload.work_permit_number ?? null,
-      social_insurance_number: payload.social_insurance_number || null,
+      social_insurance_number: normalizeNAS(payload.social_insurance_number) || null,
       permit_expiry: payload.permit_expiry || null,
       offered_wage: payload.offered_wage ? Number(payload.offered_wage) : null,
       offered_hours: payload.offered_hours ? Number(payload.offered_hours) : null,

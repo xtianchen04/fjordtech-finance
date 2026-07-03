@@ -8,6 +8,7 @@ import {
   Bell,
   CreditCard,
   Newspaper,
+  Settings as SettingsIcon,
   Users,
   Check,
   AlertTriangle,
@@ -35,6 +36,7 @@ import Generator from './Generator'
 import Alerts from './Alerts'
 import Billing from './Billing'
 import RegulatoryUpdates from './RegulatoryUpdates'
+import Settings from './Settings'
 import WorkerForm from './WorkerForm'
 import WorkerDetail from './WorkerDetail'
 
@@ -46,6 +48,7 @@ const NAV = [
   { id: 'vault', label: 'Coffre-fort documentaire', Icon: Lock },
   { id: 'generator', label: 'Générateur de documents', Icon: FileText },
   { id: 'billing', label: 'Abonnement', Icon: CreditCard },
+  { id: 'settings', label: 'Paramètres', Icon: SettingsIcon },
 ]
 
 const STATUS_ICON = { ok: Check, warn: AlertTriangle, pending: AlertTriangle, missing: XCircle, na: Clock }
@@ -60,7 +63,10 @@ function initials(text = '') {
     .join('')
 }
 
-export default function ComplyHub({ org, user, demo = false }) {
+export default function ComplyHub({ org: orgProp, user, demo = false }) {
+  // Copie locale de l'organisation : mise à jour immédiate après l'écran Paramètres
+  // (en-tête, veille réglementaire, fenêtre d'alerte…).
+  const [org, setOrg] = useState(orgProp)
   const [tab, setTab] = useState('dashboard')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -129,8 +135,8 @@ export default function ComplyHub({ org, user, demo = false }) {
   }, [workers, complianceByWorker])
 
   const alerts = useMemo(
-    () => computeAlerts(workers, complianceByWorker),
-    [workers, complianceByWorker],
+    () => computeAlerts(workers, complianceByWorker, org.alert_window_days ?? 90),
+    [workers, complianceByWorker, org.alert_window_days],
   )
 
   const aggregatedConditions = useMemo(() => {
@@ -290,6 +296,7 @@ export default function ComplyHub({ org, user, demo = false }) {
               />
             )}
             {tab === 'billing' && <Billing org={org} />}
+            {tab === 'settings' && <Settings org={org} onSaved={setOrg} />}
           </>
         )}
       </main>

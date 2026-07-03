@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { X, Loader2 } from 'lucide-react'
+import { X, Loader2, Eye, EyeOff, ShieldCheck } from 'lucide-react'
 import { createWorker } from '../lib/api'
 import { PROVINCES, PROGRAMS } from '../lib/constants'
+import { formatNAS, normalizeNAS, isValidNAS } from '../lib/nas'
 
 // Modal d'ajout d'un travailleur étranger.
 // La création génère automatiquement les conditions de conformité (voir api.createWorker).
@@ -20,17 +21,27 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showNas, setShowNas] = useState(false)
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
   }
 
+  // NAS valide (Luhn) ou champ vide → on autorise. Sert à afficher l'état du champ.
+  const nasDigits = normalizeNAS(form.social_insurance_number)
+  const nasValid = nasDigits.length === 0 || isValidNAS(nasDigits)
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    // Bloque une saisie de NAS manifestement erronée (mais le champ reste facultatif).
+    if (nasDigits.length > 0 && !isValidNAS(nasDigits)) {
+      setError('Le NAS saisi est invalide (9 chiffres, validation Luhn). Corrigez-le ou laissez le champ vide.')
+      return
+    }
     setLoading(true)
     try {
-      const worker = await createWorker(orgId, form)
+      const worker = await createWorker(orgId, { ...form, social_insurance_number: nasDigits })
       onCreated?.(worker)
       onClose?.()
     } catch (err) {
@@ -116,15 +127,32 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
               <label className="field-label" htmlFor="social_insurance_number">
                 NAS (Numéro d'assurance sociale)
               </label>
-              <input
-                id="social_insurance_number"
-                inputMode="numeric"
-                autoComplete="off"
-                className="field-input"
-                value={form.social_insurance_number}
-                onChange={(e) => update('social_insurance_number', e.target.value)}
-                placeholder="9XX XXX XXX"
-              />
+              <div className="relative">
+                <input
+                  id="social_insurance_number"
+                  type={showNas ? 'text' : 'password'}
+                  inputMode="numeric"
+                  autoComplete="off"
+                  className={`field-input pr-10 ${!nasValid ? 'border-danger' : ''}`}
+                  value={showNas ? formatNAS(form.social_insurance_number) : nasDigits}
+                  onChange={(e) => update('social_insurance_number', e.target.value)}
+                  placeholder="9XX XXX XXX"
+                  aria-invalid={!nasValid}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNas((v) => !v)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9FB0BF] hover:text-steel"
+                  title={showNas ? 'Masquer le NAS' : 'Afficher le NAS'}
+                  aria-label={showNas ? 'Masquer le NAS' : 'Afficher le NAS'}
+                >
+                  {showNas ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <p className="mt-1 text-[11px] text-[#7A8FA0] flex items-center gap-1">
+                <ShieldCheck size={12} className="text-steel" />
+                Donnée sensible — masquée par défaut, stockée de façon isolée (RLS).
+              </p>
             </div>
             <div>
               <label className="field-label" htmlFor="permit_expiry">

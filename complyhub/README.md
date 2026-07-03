@@ -42,6 +42,12 @@ Exécutez dans l'ordre :
 1. [`schema.sql`](./schema.sql) — tables + Row Level Security
 2. [`seed_compliance_conditions.sql`](./seed_compliance_conditions.sql) — référentiel des conditions
 3. [`storage_policies.sql`](./storage_policies.sql) — bucket privé `documents` + politiques
+4. [`migrations/2026-06_settings_notifications.sql`](./migrations/2026-06_settings_notifications.sql) — colonnes Paramètres & préférences de notification (requis pour enregistrer les préférences d'alerte)
+
+Migrations optionnelles (sécurité / alertes courriel) :
+
+- [`migrations/2026-06_nas_encryption.sql`](./migrations/2026-06_nas_encryption.sql) — chiffrement du NAS au repos (voir [`SECURITY.md`](./SECURITY.md))
+- [`migrations/2026-06_schedule_send_alerts.sql`](./migrations/2026-06_schedule_send_alerts.sql) — planification quotidienne des alertes par courriel
 
 ### 4. Lancer
 
@@ -63,11 +69,33 @@ automatiquement et le score de préparation est recalculé.
 ## Modules
 
 - **Tableau de bord** — score de préparation, statistiques, liste des travailleurs (cliquables pour éditer leur conformité), conditions agrégées.
-- **Alertes** — permis qui expirent (≤ 90 j) et conditions manquantes, calculées automatiquement.
+- **Alertes** — permis qui expirent et conditions manquantes, calculées automatiquement (fenêtre configurable dans les Paramètres).
+- **Veille réglementaire** — liens officiels (fédéral IRCC/EDSC + province d'établissement) tenus à jour par les gouvernements.
 - **Simulateur d'inspection** — questions types d'un inspecteur IRCC/ESDC, résultat calculé et **sauvegardé** (historique).
 - **Coffre-fort documentaire** — upload / téléchargement / suppression réels via **Supabase Storage**, conservation 6 ans.
 - **Générateur de documents** — documents imprimables (PDF) remplis avec vos données réelles.
+- **Paramètres** — modifier l'organisation (nom, adresse, **province/lieu d'établissement**) et les **préférences de notification** (courriel, délai d'alerte).
 - **Abonnement** — paliers et paiement via **Stripe Checkout**.
+
+## Alertes par courriel (optionnel)
+
+Les alertes sont visibles dans l'app sans configuration. Pour les **recevoir par
+courriel**, déployez la fonction Edge `send-alerts` :
+
+1. Appliquez `migrations/2026-06_settings_notifications.sql`.
+2. Définissez les secrets et déployez :
+   ```bash
+   supabase secrets set RESEND_API_KEY=re_...
+   supabase secrets set ALERTS_FROM="ComplyHub <alertes@votredomaine.ca>"
+   supabase functions deploy send-alerts
+   ```
+3. Planifiez l'envoi quotidien avec `migrations/2026-06_schedule_send_alerts.sql`.
+4. Dans l'app → **Paramètres**, activez les notifications et renseignez le courriel.
+
+## Sécurité
+
+Voir [`SECURITY.md`](./SECURITY.md) — protections RLS, durcissement du NAS et
+chiffrement au repos (optionnel).
 
 ## Facturation (Stripe) — optionnel
 

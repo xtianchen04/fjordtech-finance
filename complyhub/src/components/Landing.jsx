@@ -119,7 +119,12 @@ export default function Landing({ onStart, onDemo }) {
       </section>
 
       <footer className="border-t border-line py-8 text-center text-[12.5px] text-[#9FB0BF]">
-        © {new Date().getFullYear()} ComplyHub · Conformité TET/PMI · Tous droits réservés.
+        <a href="#/employe" className="text-steel font-semibold hover:underline">
+          Aperçu du portail employé (maquette)
+        </a>
+        <div className="mt-2">
+          © {new Date().getFullYear()} ComplyHub · Conformité TET/PMI · Tous droits réservés.
+        </div>
       </footer>
     </div>
   )
