@@ -1635,6 +1635,34 @@ footer {
   background: radial-gradient(circle, rgba(168,85,247,.2) 0%, transparent 70%);
 }
 
+.lab-card-penombre {
+  background: linear-gradient(135deg, #0d1f2d 0%, #0a1929 100%);
+  border: 1px solid rgba(14,116,144,.2);
+}
+
+.lab-card-penombre:hover {
+  border-color: rgba(14,116,144,.38);
+  box-shadow: 0 0 80px rgba(14,116,144,.12), inset 0 1px 0 rgba(14,116,144,.15);
+}
+
+.lab-card-penombre::before {
+  background: radial-gradient(circle, rgba(14,116,144,.18) 0%, transparent 70%);
+}
+
+.lab-card-complyhub {
+  background: linear-gradient(135deg, #0a2217 0%, #0d2e1e 100%);
+  border: 1px solid rgba(34,197,94,.18);
+}
+
+.lab-card-complyhub:hover {
+  border-color: rgba(34,197,94,.35);
+  box-shadow: 0 0 80px rgba(34,197,94,.10), inset 0 1px 0 rgba(34,197,94,.15);
+}
+
+.lab-card-complyhub::before {
+  background: radial-gradient(circle, rgba(34,197,94,.15) 0%, transparent 70%);
+}
+
 .lab-card-head {
   display: flex;
   align-items: flex-start;
@@ -1661,6 +1689,16 @@ footer {
 .logo-nexkid {
   background: linear-gradient(135deg, #7c3aed, #a855f7);
   color: white;
+}
+
+.logo-penombre {
+  background: linear-gradient(135deg, #0f2027, #0e7490);
+  color: #7dd3fc;
+}
+
+.logo-complyhub {
+  background: linear-gradient(135deg, #14532d, #16a34a);
+  color: #bbf7d0;
   font-size: .95rem;
 }
 
@@ -1737,8 +1775,10 @@ footer {
   flex-shrink: 0;
 }
 
-.dot-blue { background: var(--blue); }
+.dot-blue   { background: var(--blue); }
 .dot-purple { background: #a855f7; }
+.dot-teal   { background: #0e7490; }
+.dot-green  { background: #22c55e; }
 
 .lab-card-footer {
   display: flex;
