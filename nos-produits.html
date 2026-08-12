@@ -164,7 +164,7 @@
 
     .pcard-secondary-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 22px;
     }
 
@@ -253,6 +253,7 @@
 
     .logo-pc { background: linear-gradient(135deg, #1a4a8a, #2563eb); color: white; }
     .logo-nk { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; }
+    .logo-pn { background: linear-gradient(135deg, #0f2027, #0e7490); color: #7dd3fc; }
 
     .pcard-status {
       display: inline-flex;
@@ -745,8 +746,32 @@
         </div>
       </div>
 
+      <!-- PÉNOMBRE -->
+      <div class="pcard" data-aos data-aos-delay="100" style="background:linear-gradient(160deg,#0d1f2d 0%,#0a1929 100%);border-color:rgba(14,116,144,.25)">
+        <div class="pcard-top">
+          <div class="pcard-logo logo-pn">P</div>
+          <span class="pcard-status s-dev">En développement</span>
+        </div>
+        <div class="pcard-name">Pénombre</div>
+        <div class="pcard-tagline">Écris en privé. Vraiment. — Messagerie chiffrée de bout en bout, sans compte, sans traçage.</div>
+        <ul class="pcard-feats">
+          <li><span class="feat-dot" style="background:#0e7490;box-shadow:0 0 6px #0e7490"></span>Chiffrement de bout en bout</li>
+          <li><span class="feat-dot" style="background:#0e7490;box-shadow:0 0 6px #0e7490"></span>Aucun compte utilisateur requis</li>
+          <li><span class="feat-dot" style="background:#0e7490;box-shadow:0 0 6px #0e7490"></span>Messages, photos &amp; appels privés</li>
+          <li><span class="feat-dot" style="background:#0e7490;box-shadow:0 0 6px #0e7490"></span>Identité cryptographique locale</li>
+        </ul>
+        <div class="pcard-bottom">
+          <div class="pcard-tech-tags">
+            <span class="tech-tag-mini">E2E Encryption</span>
+            <span class="tech-tag-mini">P2P</span>
+            <span class="tech-tag-mini">IA</span>
+          </div>
+          <a href="https://penombre-website.vercel.app" target="_blank" rel="noopener" class="pcard-link">Voir le site →</a>
+        </div>
+      </div>
+
       <!-- 1 slot locked -->
-      <div class="pcard pcard-locked" data-aos data-aos-delay="100">
+      <div class="pcard pcard-locked" data-aos data-aos-delay="200">
         <div class="locked-icon"><i data-lucide="lock"></i></div>
         <div class="locked-label">Prochain produit</div>
         <div class="locked-year">FjordTech Lab · 2026</div>
@@ -827,6 +852,7 @@
         <ul>
           <li><a href="https://parcoursca.ca" target="_blank" rel="noopener">ParcoursCA</a></li>
           <li><a href="https://website-git-main-xtianchen04s-projects.vercel.app/" target="_blank" rel="noopener">NEXKID</a></li>
+          <li><a href="https://penombre-website.vercel.app" target="_blank" rel="noopener">Pénombre</a></li>
           <li><a href="#waitlistForm">Produits à venir</a></li>
         </ul>
       </div>
