@@ -132,28 +132,38 @@ export async function getWorkers(orgId) {
  */
 export async function createWorker(orgId, payload) {
   if (isDemo()) return demoStore.createWorker(orgId, payload)
-  const { data: worker, error } = await supabase
-    .from('workers')
-    .insert({
-      org_id: orgId,
-      full_name: payload.full_name,
-      program: payload.program ?? 'PMI',
-      occupation: payload.occupation ?? null,
-      work_permit_number: payload.work_permit_number ?? null,
-      social_insurance_number: normalizeNAS(payload.social_insurance_number) || null,
-      permit_expiry: payload.permit_expiry || null,
-      offered_wage: payload.offered_wage ? Number(payload.offered_wage) : null,
-      offered_hours: payload.offered_hours ? Number(payload.offered_hours) : null,
-      work_province: payload.work_province ?? null,
-      start_date: payload.start_date || null,
-      status: payload.status ?? 'active',
-      email: payload.email || null,
-      primary_language: payload.primary_language || null,
-      secondary_language: payload.secondary_language || null,
-    })
-    .select()
-    .single()
 
+  // Colonnes de base (toujours présentes) + colonnes de portail (ajoutées par
+  // la migration 2026-10_team_messaging.sql, possiblement absentes).
+  const core = {
+    org_id: orgId,
+    full_name: payload.full_name,
+    program: payload.program ?? 'PMI',
+    occupation: payload.occupation ?? null,
+    work_permit_number: payload.work_permit_number ?? null,
+    social_insurance_number: normalizeNAS(payload.social_insurance_number) || null,
+    permit_expiry: payload.permit_expiry || null,
+    offered_wage: payload.offered_wage ? Number(payload.offered_wage) : null,
+    offered_hours: payload.offered_hours ? Number(payload.offered_hours) : null,
+    work_province: payload.work_province ?? null,
+    start_date: payload.start_date || null,
+    status: payload.status ?? 'active',
+  }
+  const portal = {
+    email: payload.email || null,
+    primary_language: payload.primary_language || null,
+    secondary_language: payload.secondary_language || null,
+  }
+
+  async function insert(row) {
+    return supabase.from('workers').insert(row).select().single()
+  }
+
+  let { data: worker, error } = await insert({ ...core, ...portal })
+  // Migration du portail non appliquée : on réessaie sans les colonnes de portail.
+  if (error && /column|does not exist|schema cache|email|language/i.test(error.message ?? '')) {
+    ;({ data: worker, error } = await insert(core))
+  }
   if (error) throw error
 
   await generateWorkerCompliance(worker.id, worker.program)
