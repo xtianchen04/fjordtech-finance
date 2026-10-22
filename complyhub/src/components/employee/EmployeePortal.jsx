@@ -12,7 +12,7 @@ import {
   Send,
   Globe,
 } from 'lucide-react'
-import { LANGUAGES, makeT } from '../../lib/i18n'
+import { LANGUAGES, makeT, isRTL } from '../../lib/i18n'
 import { maskNAS } from '../../lib/nas'
 
 // ============================================================
@@ -32,7 +32,7 @@ export default function EmployeePortal() {
   const t = useMemo(() => makeT(lang), [lang])
 
   return (
-    <div className="min-h-screen bg-paper flex flex-col">
+    <div className="min-h-screen bg-paper flex flex-col" dir={isRTL(lang) ? 'rtl' : 'ltr'}>
       <Header t={t} lang={lang} setLang={setLang} authed={authed} onLogout={() => setAuthed(false)} />
       <div className="bg-mist text-deep text-[12px] text-center py-1.5 px-4">{t('preview_banner')}</div>
       {authed ? <Dashboard t={t} lang={lang} /> : <Login t={t} onLogin={() => setAuthed(true)} />}
