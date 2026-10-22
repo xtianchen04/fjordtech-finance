@@ -13,7 +13,9 @@ import {
   Globe,
   Loader2,
   ExternalLink,
+  HelpCircle,
 } from 'lucide-react'
+import ResourceCenter from '../ResourceCenter'
 import { LANGUAGES, makeT } from '../../lib/i18n'
 import { maskNAS, maskFromLast3 } from '../../lib/nas'
 import { signOut } from '../../lib/supabase'
@@ -103,6 +105,7 @@ export default function EmployeeApp({ worker: initialWorker, user }) {
             { id: 'documents', Icon: FileText, key: 'nav_documents' },
             { id: 'form', Icon: Download, key: 'nav_form' },
             { id: 'messages', Icon: MessageSquare, key: 'nav_messages' },
+            { id: 'resources', Icon: HelpCircle, key: 'nav_resources' },
           ].map(({ id, Icon, key }) => (
             <button
               key={id}
@@ -128,6 +131,7 @@ export default function EmployeeApp({ worker: initialWorker, user }) {
           {tab === 'documents' && <DocumentsTab t={t} worker={worker} />}
           {tab === 'form' && <FormTab t={t} worker={worker} lang={lang} />}
           {tab === 'messages' && <MessagesTab t={t} worker={worker} />}
+          {tab === 'resources' && <ResourceCenter kind="employee" lang={lang} />}
 
           <p className="mt-5 text-[11.5px] text-[#7A8FA0] flex items-start gap-1.5 leading-relaxed">
             <Clock size={13} className="text-steel flex-shrink-0 mt-0.5" />
