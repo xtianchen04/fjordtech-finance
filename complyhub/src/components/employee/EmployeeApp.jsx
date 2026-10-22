@@ -65,9 +65,7 @@ export default function EmployeeApp({ worker: initialWorker, user }) {
           className="flex items-center gap-3 hover:opacity-90 transition"
           title={t('nav_profile')}
         >
-          <div className="bg-gold rounded-xl p-2">
-            <ShieldCheck size={20} className="text-ink" strokeWidth={2.5} />
-          </div>
+          <img src="/complyhub-shield.png" alt="ComplyHub" className="h-10 w-auto logo-penumbra-dark" />
           <div className="text-left">
             <div className="font-serif font-extrabold text-[17px] leading-none">ComplyHub</div>
             <div className="text-[10px] text-sky font-semibold uppercase tracking-widest mt-1">

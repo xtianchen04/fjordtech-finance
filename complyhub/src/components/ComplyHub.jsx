@@ -189,9 +189,7 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
           className="flex items-center gap-3 px-2 pb-6 text-left hover:opacity-90 transition"
           title="Tableau de bord"
         >
-          <div className="bg-gold rounded-xl p-2 flex items-center justify-center">
-            <ShieldCheck size={22} className="text-ink" strokeWidth={2.5} />
-          </div>
+          <img src="/complyhub-shield.png" alt="ComplyHub" className="h-11 w-auto logo-penumbra-dark" />
           <div>
             <div className="font-serif font-extrabold text-[19px] tracking-tight leading-none">
               ComplyHub

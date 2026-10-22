@@ -44,9 +44,7 @@ function Header({ t, lang, setLang, authed, onLogout }) {
   return (
     <header className="flex items-center justify-between px-5 sm:px-8 py-4 bg-ink text-white">
       <a href="#/" className="flex items-center gap-3 hover:opacity-90 transition" title="Accueil">
-        <div className="bg-gold rounded-xl p-2">
-          <ShieldCheck size={20} className="text-ink" strokeWidth={2.5} />
-        </div>
+        <img src="/complyhub-shield.png" alt="ComplyHub" className="h-10 w-auto logo-penumbra-dark" />
         <div>
           <div className="font-serif font-extrabold text-[17px] leading-none">ComplyHub</div>
           <div className="text-[10px] text-sky font-semibold uppercase tracking-widest mt-1">

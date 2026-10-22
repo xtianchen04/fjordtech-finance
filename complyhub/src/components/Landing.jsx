@@ -24,12 +24,10 @@ export default function Landing({ onStart, onDemo }) {
     <div className="min-h-screen bg-paper text-ink">
       {/* Barre de navigation */}
       <header className="flex items-center justify-between px-6 sm:px-10 py-5 max-w-6xl mx-auto">
-        <div className="flex items-center gap-2.5">
-          <div className="bg-gold rounded-xl p-2">
-            <ShieldCheck size={20} className="text-ink" strokeWidth={2.5} />
-          </div>
+        <a href="#/" className="flex items-center gap-2.5">
+          <img src="/complyhub-shield.png" alt="ComplyHub" className="h-10 w-auto logo-penumbra" />
           <div className="font-serif font-extrabold text-lg">ComplyHub</div>
-        </div>
+        </a>
         <div className="flex items-center gap-3">
           <LanguageSwitcher variant="light" />
           <button onClick={onStart} className="btn-primary">
@@ -39,9 +37,19 @@ export default function Landing({ onStart, onDemo }) {
       </header>
 
       {/* Hero */}
-      <section className="max-w-3xl mx-auto text-center px-6 pt-16 pb-20">
-        <div className="inline-flex items-center gap-2 bg-mist text-steel text-[12px] font-semibold px-3 py-1.5 rounded-full mb-6">
-          <ShieldCheck size={14} /> {c.badge}
+      <section className="max-w-3xl mx-auto text-center px-6 pt-12 pb-20">
+        <div className="relative inline-flex justify-center mb-7">
+          <div className="absolute -inset-10 logo-halo" aria-hidden="true" />
+          <img
+            src="/complyhub-shield.png"
+            alt="ComplyHub"
+            className="relative h-28 sm:h-32 w-auto logo-penumbra"
+          />
+        </div>
+        <div className="flex justify-center">
+          <div className="inline-flex items-center gap-2 bg-mist text-steel text-[12px] font-semibold px-3 py-1.5 rounded-full mb-6">
+            <ShieldCheck size={14} /> {c.badge}
+          </div>
         </div>
         <h1 className="font-serif text-4xl sm:text-5xl font-extrabold leading-tight tracking-tight">
           {c.heroTitle}
