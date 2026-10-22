@@ -311,6 +311,39 @@ const RIGHTS = {
 }
 
 /**
+ * Construit le journal d'audit en HTML imprimable (→ « Enregistrer en PDF »).
+ * @param {{rows: Array<{date,actor,action,worker,entity,detail}>, filterLabel?: string}} ctx
+ * @returns {string} HTML complet
+ */
+export function buildAuditPdf({ rows = [], filterLabel = '' } = {}) {
+  const body = rows
+    .map(
+      (r) => `<tr>
+        <td>${esc(r.date)}</td>
+        <td>${esc(r.actor)}</td>
+        <td>${esc(r.action)}</td>
+        <td>${esc(r.worker || '—')}</td>
+        <td>${esc(r.detail || '—')}</td>
+      </tr>`,
+    )
+    .join('')
+  return wrap(
+    "Journal d'audit",
+    `
+    <p>Export horodaté du journal d'audit — actions enregistrées de façon immuable,
+    à présenter en cas d'inspection d'IRCC ou d'ESDC.</p>
+    ${filterLabel ? `<p><b>Filtre :</b> ${esc(filterLabel)}</p>` : ''}
+    <p><b>${rows.length}</b> entrée(s).</p>
+    <table>
+      <thead><tr><th>Date</th><th>Acteur</th><th>Action</th><th>Travailleur</th><th>Détail</th></tr></thead>
+      <tbody>${body || '<tr><td colspan="5">Aucune entrée.</td></tr>'}</tbody>
+    </table>
+    <p>Les registres sont conservés 6 ans conformément à l'article R209.4 du RIPR.</p>`,
+    null,
+  )
+}
+
+/**
  * Construit la fiche d'information sur les droits (HTML imprimable).
  * @param {{worker?:object, lang?:string}} ctx
  * @returns {string} HTML complet

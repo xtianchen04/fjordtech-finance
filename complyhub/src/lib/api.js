@@ -513,6 +513,18 @@ export async function getMyWorker() {
   return data
 }
 
+/**
+ * Déchiffre le NAS complet d'un travailleur (réservé au propriétaire de
+ * l'organisation, via la fonction worker_nas). Utilisé pour l'affichage
+ * « Afficher » côté employeur quand le chiffrement au repos est actif.
+ */
+export async function getWorkerNas(workerId) {
+  if (isDemo()) return demoStore.getWorkerNas(workerId)
+  const { data, error } = await supabase.rpc('worker_nas', { p_worker_id: workerId })
+  if (error) throw error
+  return data
+}
+
 /** L'employé met à jour les champs autorisés de sa propre fiche. */
 export async function updateMyWorkerProfile(patch) {
   const { data, error } = await supabase.rpc('update_my_worker_profile', {

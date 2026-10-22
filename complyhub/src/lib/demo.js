@@ -243,6 +243,11 @@ export const demoStore = {
     pushAudit({ action: 'update.invitations', entity_type: 'invitations', entity_id: invitationId, worker_id: inv?.worker_id })
   },
 
+  async getWorkerNas(workerId) {
+    const w = workers.find((x) => x.id === workerId)
+    return w?.social_insurance_number ?? null
+  },
+
   // ---------- Journal d'audit ----------
   async getAuditLogs(orgId, opts = {}) {
     let rows = auditLogs.filter((l) => l.org_id === orgId)

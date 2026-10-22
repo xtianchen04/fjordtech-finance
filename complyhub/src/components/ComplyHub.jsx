@@ -31,6 +31,7 @@ import {
   computeAlerts,
 } from '../lib/api'
 import { STATUS } from '../lib/constants'
+import { useLang } from '../lib/LanguageContext'
 import Gauge from './Gauge'
 import Simulator from './Simulator'
 import Vault from './Vault'
@@ -45,16 +46,16 @@ import WorkerForm from './WorkerForm'
 import WorkerDetail from './WorkerDetail'
 
 const NAV = [
-  { id: 'dashboard', label: 'Tableau de bord', Icon: LayoutDashboard },
-  { id: 'alerts', label: 'Alertes', Icon: Bell },
-  { id: 'messaging', label: 'Messagerie', Icon: MessageSquare },
-  { id: 'updates', label: 'Veille réglementaire', Icon: Newspaper },
-  { id: 'simulator', label: "Simulateur d'inspection", Icon: FileCheck },
-  { id: 'vault', label: 'Coffre-fort documentaire', Icon: Lock },
-  { id: 'generator', label: 'Générateur de documents', Icon: FileText },
-  { id: 'audit', label: "Journal d'audit", Icon: ScrollText },
-  { id: 'billing', label: 'Abonnement', Icon: CreditCard },
-  { id: 'settings', label: 'Paramètres', Icon: SettingsIcon },
+  { id: 'dashboard', key: 'd_nav_dashboard', Icon: LayoutDashboard },
+  { id: 'alerts', key: 'd_nav_alerts', Icon: Bell },
+  { id: 'messaging', key: 'd_nav_messaging', Icon: MessageSquare },
+  { id: 'updates', key: 'd_nav_updates', Icon: Newspaper },
+  { id: 'simulator', key: 'd_nav_simulator', Icon: FileCheck },
+  { id: 'vault', key: 'd_nav_vault', Icon: Lock },
+  { id: 'generator', key: 'd_nav_generator', Icon: FileText },
+  { id: 'audit', key: 'd_nav_audit', Icon: ScrollText },
+  { id: 'billing', key: 'd_nav_billing', Icon: CreditCard },
+  { id: 'settings', key: 'd_nav_settings', Icon: SettingsIcon },
 ]
 
 const STATUS_ICON = { ok: Check, warn: AlertTriangle, pending: AlertTriangle, missing: XCircle, na: Clock }
@@ -72,6 +73,7 @@ function initials(text = '') {
 export default function ComplyHub({ org: orgProp, user, demo = false }) {
   // Copie locale de l'organisation : mise à jour immédiate après l'écran Paramètres
   // (en-tête, veille réglementaire, fenêtre d'alerte…).
+  const { t } = useLang()
   const [org, setOrg] = useState(orgProp)
   const [tab, setTab] = useState('dashboard')
   const [loading, setLoading] = useState(true)
@@ -172,13 +174,13 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
       : aggregatedConditions.filter((c) => c.regime === filter || c.regime === 'Commun')
 
   const STAT_DATA = [
-    { Icon: Users, val: counts.workers, label: 'Travailleurs actifs', accent: '#2E6CA4' },
-    { Icon: Check, val: counts.ok, label: 'Conditions conformes', accent: '#2E9E6B' },
-    { Icon: AlertTriangle, val: counts.warn, label: 'À vérifier', accent: '#E0A030' },
-    { Icon: XCircle, val: counts.missing, label: 'Éléments manquants', accent: '#D1495B' },
+    { Icon: Users, val: counts.workers, label: t('d_stat_workers'), accent: '#2E6CA4' },
+    { Icon: Check, val: counts.ok, label: t('d_stat_ok'), accent: '#2E9E6B' },
+    { Icon: AlertTriangle, val: counts.warn, label: t('d_stat_warn'), accent: '#E0A030' },
+    { Icon: XCircle, val: counts.missing, label: t('d_stat_missing'), accent: '#D1495B' },
   ]
 
-  const pageTitle = NAV.find((n) => n.id === tab)?.label ?? ''
+  const pageTitle = t(NAV.find((n) => n.id === tab)?.key ?? '')
 
   return (
     <div className="flex min-h-screen">
@@ -187,7 +189,7 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
         <button
           onClick={() => setTab('dashboard')}
           className="flex items-center gap-3 px-2 pb-6 text-left hover:opacity-90 transition"
-          title="Tableau de bord"
+          title={t('d_nav_dashboard')}
         >
           <img src="/complyhub-shield.png" alt="ComplyHub" className="h-11 w-auto logo-penumbra-dark" />
           <div>
@@ -195,19 +197,19 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
               ComplyHub
             </div>
             <div className="text-[10px] text-sky font-semibold uppercase tracking-widest mt-1">
-              Conformité TET · PMI
+              {t('d_tagline')}
             </div>
           </div>
         </button>
 
         <nav className="flex flex-col gap-1">
-          {NAV.map(({ id, label, Icon }) => (
+          {NAV.map(({ id, key, Icon }) => (
             <button
               key={id}
               className={`nav-btn ${tab === id ? 'active' : ''}`}
               onClick={() => setTab(id)}
             >
-              <Icon size={18} /> <span className="flex-1">{label}</span>
+              <Icon size={18} /> <span className="flex-1">{t(key)}</span>
               {id === 'alerts' && alerts.length > 0 && (
                 <span className="bg-danger text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                   {alerts.length}
@@ -223,10 +225,10 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
         >
           <div className="flex items-center gap-2 mb-2 text-xs font-bold">
             <Bell size={15} className="text-gold" />
-            <span>{alerts.length} alerte(s) active(s)</span>
+            <span>{alerts.length} {t('d_alerts_active')}</span>
           </div>
           <div className="text-[11.5px] text-[#9FB8CE] leading-relaxed">
-            {alerts[0]?.detail ?? 'Aucune alerte critique. Continuez le suivi de vos conditions.'}
+            {alerts[0]?.detail ?? t('d_alerts_none')}
           </div>
         </button>
       </aside>
@@ -235,8 +237,7 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
       <main className="flex-1 px-6 sm:px-10 py-8 max-w-[1100px]">
         {demo && (
           <div className="mb-5 text-[12.5px] bg-mist text-deep rounded-xl px-4 py-3 flex items-center gap-2">
-            <span className="font-bold">Mode démo</span> — données d'exemple, rien n'est
-            sauvegardé. Rechargez la page pour réinitialiser.
+            <span className="font-bold">{t('d_demo_mode')}</span> {t('d_demo_banner')}
           </div>
         )}
         <div className="flex justify-between items-start mb-7 gap-4">
@@ -253,13 +254,13 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
                 {initials(me?.email ?? org.name)}
               </div>
               <span className="text-[13.5px] font-semibold hidden sm:inline">
-                {me?.email ?? 'Mon compte'}
+                {me?.email ?? t('d_account')}
               </span>
             </div>
             <button
               onClick={() => (demo ? window.location.reload() : signOut())}
               className="text-[#7A8FA0] hover:text-ink"
-              title={demo ? 'Quitter la démo' : 'Se déconnecter'}
+              title={demo ? t('d_demo_quit') : t('d_logout')}
             >
               <LogOut size={18} />
             </button>
@@ -272,7 +273,7 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
 
         {loading ? (
           <div className="flex items-center gap-3 text-[#5E7385] py-20 justify-center">
-            <Loader2 size={20} className="animate-spin" /> Chargement…
+            <Loader2 size={20} className="animate-spin" /> {t('loading')}
           </div>
         ) : (
           <>
@@ -337,19 +338,17 @@ function DashboardTab({
   onAddWorker,
   onOpenWorker,
 }) {
+  const { t } = useLang()
   if (workers.length === 0) {
     return (
       <div className="card flex flex-col items-center justify-center text-center py-16">
         <div className="bg-mist rounded-2xl p-4 mb-4">
           <Users size={28} className="text-steel" />
         </div>
-        <h2 className="font-serif text-xl font-extrabold mb-1.5">Aucun travailleur pour l'instant</h2>
-        <p className="text-sm text-[#5E7385] max-w-sm mb-6">
-          Ajoutez votre premier travailleur étranger. ComplyHub générera automatiquement ses
-          conditions de conformité et calculera votre score de préparation.
-        </p>
+        <h2 className="font-serif text-xl font-extrabold mb-1.5">{t('d_empty_title')}</h2>
+        <p className="text-sm text-[#5E7385] max-w-sm mb-6">{t('d_empty_desc')}</p>
         <button onClick={onAddWorker} className="btn-gold">
-          <Plus size={16} /> Ajouter un travailleur
+          <Plus size={16} /> {t('d_add_worker')}
         </button>
       </div>
     )
@@ -373,21 +372,21 @@ function DashboardTab({
         <div className="card flex items-center gap-6 flex-1 min-w-[300px]">
           <Gauge score={score} />
           <div>
-            <div className="text-base font-bold mb-1.5">Préparation à l'inspection</div>
+            <div className="text-base font-bold mb-1.5">{t('d_readiness')}</div>
             <p className="text-[13px] text-[#5E7385] leading-relaxed max-w-[280px]">
               {score >= 85
-                ? 'Votre dossier est solide. Maintenez vos conditions à jour.'
+                ? t('d_readiness_high')
                 : score >= 70
-                  ? 'Votre dossier est presque prêt. Corrigez les éléments à vérifier pour atteindre 100 %.'
-                  : 'Plusieurs éléments requièrent votre attention avant une inspection.'}
+                  ? t('d_readiness_mid')
+                  : t('d_readiness_low')}
             </p>
           </div>
         </div>
 
         <div className="card flex-1 min-w-[300px]">
           <div className="flex items-center justify-between mb-3.5">
-            <div className="text-[15px] font-bold">Travailleurs étrangers</div>
-            <button onClick={onAddWorker} className="text-steel hover:text-deep" title="Ajouter">
+            <div className="text-[15px] font-bold">{t('d_workers')}</div>
+            <button onClick={onAddWorker} className="text-steel hover:text-deep" title={t('d_add')}>
               <Plus size={18} />
             </button>
           </div>
@@ -403,7 +402,7 @@ function DashboardTab({
                   <div>
                     <div className="text-[13.5px] font-semibold">{w.full_name}</div>
                     <div className="text-[11.5px] text-[#7A8FA0]">
-                      {w.occupation ?? 'Travailleur'} · {w.program}
+                      {w.occupation ?? t('d_worker')} · {w.program}
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -424,7 +423,7 @@ function DashboardTab({
 
       <div className="card p-0 overflow-hidden">
         <div className="flex justify-between items-center px-5 py-4 border-b border-line flex-wrap gap-3">
-          <div className="text-[15px] font-bold">Conditions de conformité réglementaire</div>
+          <div className="text-[15px] font-bold">{t('d_conditions_title')}</div>
           <div className="flex gap-1.5">
             {['Tous', 'PMI', 'PTET'].map((f) => (
               <button
@@ -432,7 +431,7 @@ function DashboardTab({
                 className={`filter-btn ${filter === f ? 'active' : ''}`}
                 onClick={() => setFilter(f)}
               >
-                {f}
+                {f === 'Tous' ? t('d_filter_all') : f}
               </button>
             ))}
           </div>

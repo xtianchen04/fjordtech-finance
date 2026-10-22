@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { ShieldCheck, Loader2, Building2 } from 'lucide-react'
+import { Loader2, Building2 } from 'lucide-react'
 import { createOrganization } from '../lib/api'
 import { signOut } from '../lib/supabase'
 import { PROVINCES } from '../lib/constants'
+import { useLang } from '../lib/LanguageContext'
+import LanguageSwitcher from './LanguageSwitcher'
 
 // Affiché après la connexion lorsque l'utilisateur n'a pas encore d'organisation.
 export default function Onboarding({ onCreated }) {
+  const { t } = useLang()
   const [form, setForm] = useState({
     name: '',
     legal_name: '',
@@ -38,14 +41,15 @@ export default function Onboarding({ onCreated }) {
     <div className="min-h-screen bg-paper flex flex-col">
       <header className="flex items-center justify-between px-8 py-5 border-b border-line bg-white">
         <div className="flex items-center gap-3">
-          <div className="bg-gold rounded-xl p-2">
-            <ShieldCheck size={22} className="text-ink" strokeWidth={2.5} />
-          </div>
+          <img src="/complyhub-shield.png" alt="ComplyHub" className="h-9 w-auto logo-penumbra" />
           <div className="font-serif font-extrabold text-lg">ComplyHub</div>
         </div>
-        <button className="text-[13px] text-[#5E7385] hover:text-ink font-semibold" onClick={() => signOut()}>
-          Se déconnecter
-        </button>
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher variant="light" />
+          <button className="text-[13px] text-[#5E7385] hover:text-ink font-semibold" onClick={() => signOut()}>
+            {t('d_logout')}
+          </button>
+        </div>
       </header>
 
       <main className="flex-1 flex items-center justify-center p-6">
@@ -55,19 +59,15 @@ export default function Onboarding({ onCreated }) {
               <Building2 size={22} className="text-steel" />
             </div>
             <div>
-              <h1 className="font-serif text-2xl font-extrabold leading-tight">
-                Bienvenue dans ComplyHub
-              </h1>
-              <p className="text-sm text-[#5E7385] mt-1">
-                Configurons votre organisation pour démarrer votre dossier de conformité.
-              </p>
+              <h1 className="font-serif text-2xl font-extrabold leading-tight">{t('ob_welcome')}</h1>
+              <p className="text-sm text-[#5E7385] mt-1">{t('ob_subtitle')}</p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="card space-y-4">
             <div>
               <label className="field-label" htmlFor="name">
-                Nom commercial *
+                {t('ob_name')} *
               </label>
               <input
                 id="name"
@@ -80,7 +80,7 @@ export default function Onboarding({ onCreated }) {
             </div>
             <div>
               <label className="field-label" htmlFor="legal_name">
-                Raison sociale
+                {t('ob_legal')}
               </label>
               <input
                 id="legal_name"
@@ -93,7 +93,7 @@ export default function Onboarding({ onCreated }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="field-label" htmlFor="business_number">
-                  Numéro d'entreprise
+                  {t('ob_business_number')}
                 </label>
                 <input
                   id="business_number"
@@ -105,7 +105,7 @@ export default function Onboarding({ onCreated }) {
               </div>
               <div>
                 <label className="field-label" htmlFor="province">
-                  Province
+                  {t('ob_province')}
                 </label>
                 <select
                   id="province"
@@ -113,7 +113,7 @@ export default function Onboarding({ onCreated }) {
                   value={form.province}
                   onChange={(e) => update('province', e.target.value)}
                 >
-                  <option value="">Sélectionner…</option>
+                  <option value="">{t('ob_select')}</option>
                   {PROVINCES.map((p) => (
                     <option key={p.code} value={p.code}>
                       {p.name}
@@ -124,7 +124,7 @@ export default function Onboarding({ onCreated }) {
             </div>
             <div>
               <label className="field-label" htmlFor="address">
-                Adresse
+                {t('ob_address')}
               </label>
               <input
                 id="address"
@@ -139,7 +139,7 @@ export default function Onboarding({ onCreated }) {
 
             <button type="submit" disabled={loading || !form.name} className="btn-gold w-full">
               {loading && <Loader2 size={16} className="animate-spin" />}
-              Créer mon organisation
+              {t('ob_create')}
             </button>
           </form>
         </div>
