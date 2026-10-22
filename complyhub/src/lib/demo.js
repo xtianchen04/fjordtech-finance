@@ -75,6 +75,28 @@ let messages = [
   { id: 'm2', org_id: DEMO_ORG.id, worker_id: 'w1', sender_user_id: 'demo-emp-1', sender_role: 'employee', body: "Bonjour, c'est noté, je l'envoie demain.", created_at: new Date(Date.now() - 2 * 3600000).toISOString(), read_at: null },
 ]
 
+// Journal d'audit d'exemple + utilitaire d'ajout (mode démo).
+let auditLogs = [
+  { id: uid(), org_id: DEMO_ORG.id, user_id: DEMO_USER.id, actor_role: 'employer', action: 'insert.workers', entity_type: 'workers', entity_id: 'w1', worker_id: 'w1', details: {}, created_at: new Date(Date.now() - 6 * 86400000).toISOString() },
+  { id: uid(), org_id: DEMO_ORG.id, user_id: DEMO_USER.id, actor_role: 'employer', action: 'insert.invitations', entity_type: 'invitations', entity_id: 'inv1', worker_id: 'w1', details: {}, created_at: new Date(Date.now() - 6 * 86400000).toISOString() },
+  { id: uid(), org_id: DEMO_ORG.id, user_id: 'demo-emp-1', actor_role: 'employee', action: 'insert.documents', entity_type: 'documents', entity_id: uid(), worker_id: 'w1', details: { new: { category: 'permit' } }, created_at: new Date(Date.now() - 2 * 86400000).toISOString() },
+  { id: uid(), org_id: DEMO_ORG.id, user_id: DEMO_USER.id, actor_role: 'employer', action: 'insert.messages', entity_type: 'messages', entity_id: 'm1', worker_id: 'w1', details: {}, created_at: new Date(Date.now() - 3 * 3600000).toISOString() },
+  { id: uid(), org_id: DEMO_ORG.id, user_id: 'demo-emp-1', actor_role: 'employee', action: 'update.messages', entity_type: 'messages', entity_id: 'm1', worker_id: 'w1', details: {}, created_at: new Date(Date.now() - 2.5 * 3600000).toISOString() },
+]
+function pushAudit(entry) {
+  auditLogs.unshift({
+    id: uid(),
+    org_id: DEMO_ORG.id,
+    user_id: DEMO_USER.id,
+    actor_role: 'employer',
+    entity_id: null,
+    worker_id: null,
+    details: {},
+    created_at: new Date().toISOString(),
+    ...entry,
+  })
+}
+
 // Statuts par travailleur (clé = condition_id). Tout le reste = 'ok'.
 const OVERRIDES = {
   w1: { 2: 'warn' },
@@ -140,11 +162,13 @@ export const demoStore = {
     // Nouvelles conditions au statut 'pending'.
     const rows = buildCompliance(worker).map((r) => ({ ...r, status: 'pending' }))
     compliance = compliance.concat(rows)
+    pushAudit({ action: 'insert.workers', entity_type: 'workers', entity_id: worker.id, worker_id: worker.id })
     return worker
   },
   async updateWorkerCompliance(id, patch) {
     const row = compliance.find((r) => r.id === id)
     if (row) Object.assign(row, patch)
+    pushAudit({ action: 'update.worker_compliance', entity_type: 'worker_compliance', entity_id: id, worker_id: row?.worker_id })
     return row
   },
   async getDocuments() {
@@ -166,6 +190,7 @@ export const demoStore = {
       uploaded_at: new Date().toISOString(),
     }
     documents.unshift(doc)
+    pushAudit({ action: 'insert.documents', entity_type: 'documents', entity_id: doc.id, worker_id: workerId, details: { new: { category } } })
     return doc
   },
   async getDocumentUrl(storagePath) {
@@ -177,6 +202,7 @@ export const demoStore = {
       URL.revokeObjectURL(blobs.get(doc.storage_path))
       blobs.delete(doc.storage_path)
     }
+    pushAudit({ action: 'delete.documents', entity_type: 'documents', entity_id: doc.id, worker_id: doc.worker_id })
   },
   async saveSimulation(orgId, { score, answers }) {
     const sim = { id: uid(), org_id: orgId, score, answers, created_at: new Date().toISOString() }
@@ -208,11 +234,21 @@ export const demoStore = {
       accepted_at: null,
     }
     invitations = [inv, ...invitations.filter((i) => i.worker_id !== workerId)]
+    pushAudit({ action: 'insert.invitations', entity_type: 'invitations', entity_id: inv.id, worker_id: workerId })
     return inv
   },
   async revokeInvitation(invitationId) {
     const inv = invitations.find((i) => i.id === invitationId)
     if (inv) inv.status = 'revoked'
+    pushAudit({ action: 'update.invitations', entity_type: 'invitations', entity_id: invitationId, worker_id: inv?.worker_id })
+  },
+
+  // ---------- Journal d'audit ----------
+  async getAuditLogs(orgId, opts = {}) {
+    let rows = auditLogs.filter((l) => l.org_id === orgId)
+    if (opts.workerId) rows = rows.filter((l) => l.worker_id === opts.workerId)
+    if (opts.action) rows = rows.filter((l) => l.action === opts.action)
+    return rows.slice(0, opts.limit ?? 200).map((l) => ({ ...l }))
   },
 
   // ---------- Messagerie ----------
@@ -234,14 +270,18 @@ export const demoStore = {
       read_at: null,
     }
     messages = messages.concat(msg)
+    pushAudit({ action: 'insert.messages', entity_type: 'messages', entity_id: msg.id, worker_id: workerId, actor_role: role })
     return msg
   },
   async markMessagesRead(workerId, readerRole) {
     const senderRole = readerRole === 'employer' ? 'employee' : 'employer'
+    let changed = false
     for (const m of messages) {
       if (m.worker_id === workerId && m.sender_role === senderRole && !m.read_at) {
         m.read_at = new Date().toISOString()
+        changed = true
       }
     }
+    if (changed) pushAudit({ action: 'update.messages', entity_type: 'messages', worker_id: workerId, actor_role: readerRole })
   },
 }
