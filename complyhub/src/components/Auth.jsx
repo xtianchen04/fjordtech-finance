@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ShieldCheck, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { signIn, signUp, isSupabaseConfigured } from '../lib/supabase'
 import { useLang } from '../lib/LanguageContext'
 import LanguageSwitcher from './LanguageSwitcher'
@@ -44,9 +44,7 @@ export default function Auth({ onDemo, initialEmail = '', defaultMode = 'login',
       </div>
       <div className="w-full max-w-md">
         <div className="flex items-center gap-3 justify-center mb-8 text-white">
-          <div className="bg-gold rounded-xl p-2.5">
-            <ShieldCheck size={26} className="text-ink" strokeWidth={2.5} />
-          </div>
+          <img src="/complyhub-shield.png" alt="ComplyHub" className="h-12 w-auto logo-penumbra-dark" />
           <div>
             <div className="font-serif font-extrabold text-2xl leading-none">ComplyHub</div>
             <div className="text-[10px] text-sky font-semibold uppercase tracking-widest mt-1">
