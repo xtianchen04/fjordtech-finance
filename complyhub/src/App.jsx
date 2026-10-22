@@ -10,6 +10,7 @@ import ComplyHub from './components/ComplyHub'
 import EmployeePortal from './components/employee/EmployeePortal'
 import EmployeeApp from './components/employee/EmployeeApp'
 import InviteLanding from './components/employee/InviteLanding'
+import CabinetConsole from './components/cabinet/CabinetConsole'
 
 // Découpe l'ancre « #/chemin?clé=valeur » en { path, params }.
 function parseHash(h) {
@@ -97,6 +98,8 @@ export default function App() {
 
   // Aperçu public du portail employé (maquette), indépendant de l'authentification.
   if (path === '/employe') return <EmployeePortal />
+  // Aperçu public de la console Cabinet (maquette).
+  if (path === '/cabinet') return <CabinetConsole />
 
   if (loading) {
     return (
