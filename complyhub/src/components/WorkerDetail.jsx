@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { X, Loader2, UserPlus, Check, Copy, Mail } from 'lucide-react'
+import { X, Loader2, UserPlus, Check, Copy, Mail, Eye, EyeOff, ShieldCheck } from 'lucide-react'
 import {
   getWorkerCompliance,
   updateWorkerCompliance,
@@ -7,8 +7,10 @@ import {
   getInvitations,
   inviteWorker,
   revokeInvitation,
+  getWorkerNas,
 } from '../lib/api'
 import { STATUS } from '../lib/constants'
+import { maskNAS, maskFromLast3 } from '../lib/nas'
 
 const STATUS_OPTIONS = [
   { value: 'ok', label: 'Conforme' },
@@ -91,6 +93,7 @@ export default function WorkerDetail({ worker, onClose, onChange }) {
         </div>
 
         <div className="p-6">
+          <NasReveal worker={worker} />
           <InviteSection worker={worker} />
 
           {error && <div className="text-[12.5px] text-danger font-medium mb-3">{error}</div>}
@@ -138,6 +141,49 @@ export default function WorkerDetail({ worker, onClose, onChange }) {
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+// ---------- NAS : affichage masqué + révélation contrôlée ----------
+function NasReveal({ worker }) {
+  const [full, setFull] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const masked = maskNAS(worker.social_insurance_number) || maskFromLast3(worker.nas_last3)
+  if (!masked) return null // aucun NAS enregistré
+
+  async function reveal() {
+    if (full) {
+      setFull(null)
+      return
+    }
+    setLoading(true)
+    setError('')
+    try {
+      const value = await getWorkerNas(worker.id)
+      setFull(value || '—')
+      // Re-masque automatiquement après 15 s.
+      setTimeout(() => setFull(null), 15000)
+    } catch {
+      setError('Déchiffrement non autorisé ou indisponible.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="bg-paper border border-line rounded-xl p-4 mb-5 flex items-center gap-3">
+      <ShieldCheck size={16} className="text-steel flex-shrink-0" />
+      <div className="flex-1">
+        <div className="text-[12px] font-semibold text-[#5E7385]">NAS</div>
+        <div className="font-mono text-[14px] tracking-wide">{full ?? masked}</div>
+        {error && <div className="text-[11.5px] text-danger mt-1">{error}</div>}
+      </div>
+      <button onClick={reveal} disabled={loading} className="filter-btn" title={full ? 'Masquer' : 'Afficher'}>
+        {loading ? <Loader2 size={14} className="animate-spin" /> : full ? <EyeOff size={14} /> : <Eye size={14} />}
+      </button>
     </div>
   )
 }

@@ -32,6 +32,17 @@ export function maskNAS(value) {
 }
 
 /**
+ * Masque à partir des 3 derniers chiffres seulement (indice non sensible
+ * conservé lorsque le NAS est chiffré au repos). Ex. « 89 » → « ••• ••• •89 ».
+ */
+export function maskFromLast3(last3) {
+  const d = (last3 ?? '').replace(/\D+/g, '').slice(-3)
+  if (!d) return ''
+  const masked = ('••••••' + d.padStart(3, '•')).slice(0, 9)
+  return [masked.slice(0, 3), masked.slice(3, 6), masked.slice(6, 9)].join(' ')
+}
+
+/**
  * Valide un NAS canadien : exactement 9 chiffres et somme de Luhn valide.
  * (Le premier chiffre 0 et 8 ne sont pas attribués, mais on ne bloque pas là-dessus.)
  */

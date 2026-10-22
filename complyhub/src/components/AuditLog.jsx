@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, Download, ScrollText, Filter } from 'lucide-react'
+import { Loader2, Download, FileText, ScrollText, Filter } from 'lucide-react'
 import { getAuditLogs } from '../lib/api'
+import { buildAuditPdf } from '../lib/generators'
 
 // ============================================================
 //  Journal d'audit (côté employeur) — lecture seule.
@@ -106,6 +107,25 @@ export default function AuditLog({ orgId, workers = [] }) {
     URL.revokeObjectURL(url)
   }
 
+  function exportPdf() {
+    const parts = []
+    if (workerFilter) parts.push(`Travailleur : ${workerName[workerFilter] ?? ''}`)
+    if (actionFilter) parts.push(`Action : ${actionLabel(actionFilter)}`)
+    const rows = filtered.map((l) => ({
+      date: stamp(l.created_at),
+      actor: ROLE_STYLE[l.actor_role]?.label ?? l.actor_role,
+      action: actionLabel(l.action),
+      worker: workerName[l.worker_id] ?? '',
+      detail: detailText(l),
+    }))
+    const html = buildAuditPdf({ rows, filterLabel: parts.join(' · ') })
+    const w = window.open('', '_blank')
+    if (w) {
+      w.document.write(html)
+      w.document.close()
+    }
+  }
+
   return (
     <div className="card p-0 overflow-hidden">
       <div className="px-5 py-4 border-b border-line flex items-center justify-between flex-wrap gap-3">
@@ -118,9 +138,14 @@ export default function AuditLog({ orgId, workers = [] }) {
             </div>
           </div>
         </div>
-        <button onClick={exportCsv} disabled={!filtered.length} className="btn-primary !py-2 !px-3.5 text-[12.5px]">
-          <Download size={14} /> Exporter CSV
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={exportPdf} disabled={!filtered.length} className="btn-primary !py-2 !px-3.5 text-[12.5px]">
+            <FileText size={14} /> Exporter PDF
+          </button>
+          <button onClick={exportCsv} disabled={!filtered.length} className="filter-btn">
+            <Download size={14} /> CSV
+          </button>
+        </div>
       </div>
 
       {/* Filtres */}

@@ -15,7 +15,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { LANGUAGES, makeT } from '../../lib/i18n'
-import { maskNAS } from '../../lib/nas'
+import { maskNAS, maskFromLast3 } from '../../lib/nas'
 import { signOut } from '../../lib/supabase'
 import {
   updateMyWorkerProfile,
@@ -183,7 +183,11 @@ function ProfileTab({ t, worker, email, onSaved }) {
         </div>
         <div>
           <label className="field-label">{t('field_nas')}</label>
-          <input className="field-input bg-mist" value={maskNAS(worker.social_insurance_number) || '—'} readOnly />
+          <input
+            className="field-input bg-mist"
+            value={maskNAS(worker.social_insurance_number) || maskFromLast3(worker.nas_last3) || '—'}
+            readOnly
+          />
         </div>
         <div>
           <label className="field-label">{t('field_permit')}</label>
