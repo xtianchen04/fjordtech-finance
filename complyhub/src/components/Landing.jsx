@@ -1,26 +1,25 @@
 import {
   ShieldCheck,
-  FileCheck,
   Lock,
-  FileText,
-  Bell,
   BarChart3,
+  FileCheck,
+  Globe,
+  MessageSquare,
   ArrowRight,
   Check,
 } from 'lucide-react'
-import { PLANS } from '../lib/constants'
+import { landingContent } from '../lib/i18n'
+import { useLang } from '../lib/LanguageContext'
+import LanguageSwitcher from './LanguageSwitcher'
 
-const FEATURES = [
-  { Icon: BarChart3, t: 'Tableau de bord', d: 'Visualisez votre score de préparation à l\'inspection en un coup d\'œil.' },
-  { Icon: FileCheck, t: 'Simulateur d\'inspection', d: 'Répondez aux questions types d\'IRCC/ESDC et identifiez vos points faibles.' },
-  { Icon: Lock, t: 'Coffre-fort documentaire', d: 'Centralisez vos documents, conservés 6 ans (R209.4).' },
-  { Icon: FileText, t: 'Générateur de documents', d: 'Ententes d\'emploi, registres et lettres conformes au RIPR.' },
-  { Icon: Bell, t: 'Alertes automatiques', d: 'Soyez prévenu avant l\'expiration d\'un permis ou en cas de condition manquante.' },
-  { Icon: ShieldCheck, t: 'Conforme au RIPR', d: 'Conditions de conformité PMI et PTET, à jour et référencées.' },
-]
+// Icônes associées aux fonctionnalités (même ordre que landingContent().features).
+const FEATURE_ICONS = [BarChart3, FileCheck, Lock, Globe, MessageSquare, ShieldCheck]
 
-// Page d'accueil publique (visiteurs non connectés).
+// Page d'accueil publique (visiteurs non connectés) — multilingue.
 export default function Landing({ onStart, onDemo }) {
+  const { lang } = useLang()
+  const c = landingContent(lang)
+
   return (
     <div className="min-h-screen bg-paper text-ink">
       {/* Barre de navigation */}
@@ -31,99 +30,99 @@ export default function Landing({ onStart, onDemo }) {
           </div>
           <div className="font-serif font-extrabold text-lg">ComplyHub</div>
         </div>
-        <button onClick={onStart} className="btn-primary">
-          Se connecter
-        </button>
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher variant="light" />
+          <button onClick={onStart} className="btn-primary">
+            {c.signin}
+          </button>
+        </div>
       </header>
 
       {/* Hero */}
       <section className="max-w-3xl mx-auto text-center px-6 pt-16 pb-20">
         <div className="inline-flex items-center gap-2 bg-mist text-steel text-[12px] font-semibold px-3 py-1.5 rounded-full mb-6">
-          <ShieldCheck size={14} /> Conformité TET · PMI · PTET
+          <ShieldCheck size={14} /> {c.badge}
         </div>
         <h1 className="font-serif text-4xl sm:text-5xl font-extrabold leading-tight tracking-tight">
-          Restez conforme. Soyez prêt pour l'inspection.
+          {c.heroTitle}
         </h1>
         <p className="text-[15px] sm:text-base text-[#5E7385] mt-5 leading-relaxed max-w-2xl mx-auto">
-          ComplyHub aide les employeurs canadiens de travailleurs étrangers temporaires à suivre
-          leurs obligations réglementaires, organiser leurs documents et se préparer aux
-          inspections d'IRCC et d'ESDC — en toute sérénité.
+          {c.heroSub}
         </p>
         <div className="flex items-center justify-center gap-3 mt-8 flex-wrap">
           <button onClick={onStart} className="btn-gold">
-            Commencer gratuitement <ArrowRight size={16} />
+            {c.ctaStart} <ArrowRight size={16} />
           </button>
           {onDemo && (
             <button onClick={onDemo} className="btn-primary">
-              Voir la démo (sans inscription)
+              {c.ctaDemo}
             </button>
           )}
         </div>
-        <p className="text-[12px] text-[#9FB0BF] mt-4">
-          Outil de gestion documentaire — ne constitue pas un conseil juridique (CICC).
-        </p>
+        <p className="text-[12px] text-[#9FB0BF] mt-4">{c.disclaimer}</p>
       </section>
 
       {/* Fonctionnalités */}
       <section className="bg-white border-y border-line py-16">
         <div className="max-w-5xl mx-auto px-6">
-          <h2 className="font-serif text-2xl font-extrabold text-center mb-10">
-            Tout ce qu'il faut pour rester conforme
-          </h2>
+          <h2 className="font-serif text-2xl font-extrabold text-center mb-10">{c.featuresTitle}</h2>
           <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
-            {FEATURES.map((f) => (
-              <div key={f.t} className="card">
-                <div className="bg-mist rounded-xl p-2.5 inline-flex mb-3">
-                  <f.Icon size={20} className="text-steel" />
+            {c.features.map(([title, desc], i) => {
+              const Icon = FEATURE_ICONS[i] ?? ShieldCheck
+              return (
+                <div key={title} className="card">
+                  <div className="bg-mist rounded-xl p-2.5 inline-flex mb-3">
+                    <Icon size={20} className="text-steel" />
+                  </div>
+                  <div className="text-[15px] font-bold mb-1.5">{title}</div>
+                  <p className="text-[13px] text-[#5E7385] leading-relaxed">{desc}</p>
                 </div>
-                <div className="text-[15px] font-bold mb-1.5">{f.t}</div>
-                <p className="text-[13px] text-[#5E7385] leading-relaxed">{f.d}</p>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
 
       {/* Tarifs */}
       <section className="py-16 max-w-5xl mx-auto px-6">
-        <h2 className="font-serif text-2xl font-extrabold text-center mb-10">Tarification simple</h2>
+        <h2 className="font-serif text-2xl font-extrabold text-center mb-10">{c.pricingTitle}</h2>
         <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
-          {PLANS.map((plan) => (
-            <div
-              key={plan.id}
-              className={`bg-white rounded-2xl p-6 border ${
-                plan.featured ? 'border-gold shadow-lg' : 'border-line'
-              } flex flex-col`}
-            >
-              <div className="text-[15px] font-bold">{plan.name}</div>
-              <div className="mt-2 mb-4">
-                <span className="text-3xl font-extrabold font-serif">{plan.price}</span>
-                <span className="text-[13px] text-[#7A8FA0]"> {plan.period}</span>
-              </div>
-              <ul className="space-y-2 mb-6 flex-1">
-                {plan.features.map((feat) => (
-                  <li key={feat} className="flex items-start gap-2 text-[13px] text-[#5E7385]">
-                    <Check size={16} className="text-ok flex-shrink-0 mt-0.5" /> {feat}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={onStart}
-                className={`${plan.featured ? 'btn-gold' : 'btn-primary'} w-full`}
+          {c.plans.map(([name, price, period, features, cta], i) => {
+            const featured = i === 1 // le forfait du milieu est mis en avant
+            return (
+              <div
+                key={name}
+                className={`bg-white rounded-2xl p-6 border ${
+                  featured ? 'border-gold shadow-lg' : 'border-line'
+                } flex flex-col`}
               >
-                {plan.id === 'free' ? 'Commencer' : plan.cta}
-              </button>
-            </div>
-          ))}
+                <div className="text-[15px] font-bold">{name}</div>
+                <div className="mt-2 mb-4">
+                  <span className="text-3xl font-extrabold font-serif">{price}</span>
+                  <span className="text-[13px] text-[#7A8FA0]"> {period}</span>
+                </div>
+                <ul className="space-y-2 mb-6 flex-1">
+                  {features.map((feat) => (
+                    <li key={feat} className="flex items-start gap-2 text-[13px] text-[#5E7385]">
+                      <Check size={16} className="text-ok flex-shrink-0 mt-0.5" /> {feat}
+                    </li>
+                  ))}
+                </ul>
+                <button onClick={onStart} className={`${featured ? 'btn-gold' : 'btn-primary'} w-full`}>
+                  {i === 0 ? c.start : cta}
+                </button>
+              </div>
+            )
+          })}
         </div>
       </section>
 
       <footer className="border-t border-line py-8 text-center text-[12.5px] text-[#9FB0BF]">
         <a href="#/employe" className="text-steel font-semibold hover:underline">
-          Aperçu du portail employé (maquette)
+          {c.employeePreview}
         </a>
         <div className="mt-2">
-          © {new Date().getFullYear()} ComplyHub · Conformité TET/PMI · Tous droits réservés.
+          © {new Date().getFullYear()} ComplyHub · {c.rights}
         </div>
       </footer>
     </div>

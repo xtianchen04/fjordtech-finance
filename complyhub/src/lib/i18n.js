@@ -67,6 +67,18 @@ const STRINGS = {
     profile_locked: 'Certains renseignements sont gérés par votre employeur.',
     download_unavailable: 'Le formulaire sera fourni par votre employeur.',
     uploading: 'Téléversement…',
+    au_login_title: 'Connexion',
+    au_signup_title: 'Créer un compte',
+    au_login_sub: 'Accédez à votre tableau de bord de conformité.',
+    au_signup_sub: 'Commencez à sécuriser votre dossier de conformité.',
+    au_email: 'Courriel',
+    au_password: 'Mot de passe',
+    au_login_btn: 'Se connecter',
+    au_signup_btn: "S'inscrire",
+    au_no_account: 'Pas encore de compte ?',
+    au_create_account: 'Créer un compte',
+    au_have_account: 'Déjà inscrit ?',
+    au_signup_ok: 'Compte créé. Vérifiez votre boîte courriel pour confirmer votre adresse, puis connectez-vous.',
   },
   en: {
     portal_name: 'Employee Portal',
@@ -118,6 +130,18 @@ const STRINGS = {
     profile_locked: 'Some information is managed by your employer.',
     download_unavailable: 'The form will be provided by your employer.',
     uploading: 'Uploading…',
+    au_login_title: 'Sign in',
+    au_signup_title: 'Create an account',
+    au_login_sub: 'Access your compliance dashboard.',
+    au_signup_sub: 'Start securing your compliance file.',
+    au_email: 'Email',
+    au_password: 'Password',
+    au_login_btn: 'Sign in',
+    au_signup_btn: 'Sign up',
+    au_no_account: 'No account yet?',
+    au_create_account: 'Create an account',
+    au_have_account: 'Already registered?',
+    au_signup_ok: 'Account created. Check your email to confirm your address, then sign in.',
   },
   es: {
     portal_name: 'Portal del empleado',
@@ -169,6 +193,18 @@ const STRINGS = {
     profile_locked: 'Parte de la información la gestiona su empleador.',
     download_unavailable: 'El formulario será proporcionado por su empleador.',
     uploading: 'Subiendo…',
+    au_login_title: 'Iniciar sesión',
+    au_signup_title: 'Crear una cuenta',
+    au_login_sub: 'Acceda a su panel de cumplimiento.',
+    au_signup_sub: 'Comience a asegurar su expediente de cumplimiento.',
+    au_email: 'Correo electrónico',
+    au_password: 'Contraseña',
+    au_login_btn: 'Iniciar sesión',
+    au_signup_btn: 'Registrarse',
+    au_no_account: '¿Aún no tiene cuenta?',
+    au_create_account: 'Crear una cuenta',
+    au_have_account: '¿Ya está registrado?',
+    au_signup_ok: 'Cuenta creada. Revise su correo para confirmar su dirección y luego inicie sesión.',
   },
   tl: {
     portal_name: 'Portal ng Empleyado',
@@ -213,6 +249,18 @@ const STRINGS = {
     read_receipt: 'Nabasa',
     proof_note: 'Bawat pagpapadala, pagbasa at pag-download ay may petsa at oras bilang patunay para sa IRCC/ESDC.',
     preview_banner: 'Demo preview — walang totoong datos na nai-save.',
+    au_login_title: 'Mag-sign in',
+    au_signup_title: 'Gumawa ng account',
+    au_login_sub: 'I-access ang iyong compliance dashboard.',
+    au_signup_sub: 'Simulan ang pag-secure ng iyong compliance file.',
+    au_email: 'Email',
+    au_password: 'Password',
+    au_login_btn: 'Mag-sign in',
+    au_signup_btn: 'Mag-sign up',
+    au_no_account: 'Wala pang account?',
+    au_create_account: 'Gumawa ng account',
+    au_have_account: 'Rehistrado na?',
+    au_signup_ok: 'Nagawa na ang account. Tingnan ang iyong email para kumpirmahin, pagkatapos mag-sign in.',
   },
   pa: {
     portal_name: 'ਕਰਮਚਾਰੀ ਪੋਰਟਲ',
@@ -257,6 +305,18 @@ const STRINGS = {
     read_receipt: 'ਪੜ੍ਹਿਆ',
     proof_note: 'ਹਰ ਭੇਜਣ, ਪੜ੍ਹਨ ਅਤੇ ਡਾਊਨਲੋਡ ਦਾ ਮਿਤੀ ਤੇ ਸਮਾਂ IRCC/ESDC ਲਈ ਸਬੂਤ ਵਜੋਂ ਦਰਜ ਹੁੰਦਾ ਹੈ।',
     preview_banner: 'ਡੈਮੋ ਝਲਕ — ਕੋਈ ਅਸਲ ਡਾਟਾ ਸੰਭਾਲਿਆ ਨਹੀਂ ਜਾਂਦਾ।',
+    au_login_title: 'ਸਾਈਨ ਇਨ ਕਰੋ',
+    au_signup_title: 'ਖਾਤਾ ਬਣਾਓ',
+    au_login_sub: 'ਆਪਣਾ ਪਾਲਣਾ ਡੈਸ਼ਬੋਰਡ ਖੋਲ੍ਹੋ।',
+    au_signup_sub: 'ਆਪਣੀ ਪਾਲਣਾ ਫਾਈਲ ਸੁਰੱਖਿਅਤ ਕਰਨਾ ਸ਼ੁਰੂ ਕਰੋ।',
+    au_email: 'ਈਮੇਲ',
+    au_password: 'ਪਾਸਵਰਡ',
+    au_login_btn: 'ਸਾਈਨ ਇਨ ਕਰੋ',
+    au_signup_btn: 'ਰਜਿਸਟਰ ਕਰੋ',
+    au_no_account: 'ਹਾਲੇ ਖਾਤਾ ਨਹੀਂ?',
+    au_create_account: 'ਖਾਤਾ ਬਣਾਓ',
+    au_have_account: 'ਪਹਿਲਾਂ ਤੋਂ ਰਜਿਸਟਰਡ?',
+    au_signup_ok: 'ਖਾਤਾ ਬਣ ਗਿਆ। ਪੁਸ਼ਟੀ ਲਈ ਆਪਣੀ ਈਮੇਲ ਵੇਖੋ, ਫਿਰ ਸਾਈਨ ਇਨ ਕਰੋ।',
   },
 }
 
@@ -267,3 +327,131 @@ export function makeT(lang) {
 }
 
 export { STRINGS }
+
+// ============================================================
+//  Contenu de la page d'accueil (page principale) — multilingue.
+//  fr/en/es : complet. tl/pa : textes principaux traduits ; les listes
+//  (fonctionnalités, forfaits) reprennent l'anglais par repli.
+// ============================================================
+
+const LANDING = {
+  fr: {
+    signin: 'Se connecter',
+    badge: 'Conformité TET · PMI · PTET',
+    heroTitle: "Restez conforme. Soyez prêt pour l'inspection.",
+    heroSub:
+      "ComplyHub aide les employeurs canadiens de travailleurs étrangers temporaires à suivre leurs obligations réglementaires, organiser leurs documents et se préparer aux inspections d'IRCC et d'ESDC — avec un portail employé multilingue.",
+    ctaStart: 'Commencer gratuitement',
+    ctaDemo: 'Voir la démo (sans inscription)',
+    disclaimer: 'Outil de gestion documentaire — ne constitue pas un conseil juridique (CICC).',
+    featuresTitle: "Tout ce qu'il faut pour rester conforme",
+    pricingTitle: 'Tarification simple',
+    employeePreview: 'Aperçu du portail employé (maquette)',
+    rights: 'Tous droits réservés.',
+    start: 'Commencer',
+    features: [
+      ['Tableau de bord', "Visualisez votre score de préparation à l'inspection en un coup d'œil."],
+      ["Simulateur d'inspection", "Répondez aux questions types d'IRCC/ESDC et identifiez vos points faibles."],
+      ['Coffre-fort documentaire', 'Centralisez vos documents, conservés 6 ans (R209.4).'],
+      ['Portail employé multilingue', 'Vos travailleurs accèdent à leurs documents et messages dans leur langue.'],
+      ['Messagerie horodatée', 'Communiquez avec vos employés ; chaque échange est daté comme preuve.'],
+      ['Conforme au RIPR', 'Conditions de conformité PMI et PTET, à jour et référencées.'],
+    ],
+    plans: [
+      ['Gratuit', '0 $', '', ['1 travailleur', 'Tableau de bord', "Simulateur d'inspection"], 'Commencer'],
+      ['Pro', '49 $', '/ mois', ['Travailleurs illimités', 'Coffre-fort documentaire', 'Portail employé & messagerie', 'Alertes automatiques'], 'Passer à Pro'],
+      ['Cabinet', '149 $', '/ mois', ['Multi-organisations', 'Accès consultant (CICC)', 'Support prioritaire'], 'Contacter les ventes'],
+    ],
+  },
+  en: {
+    signin: 'Sign in',
+    badge: 'TFW Compliance · IMP · TFWP',
+    heroTitle: 'Stay compliant. Be inspection-ready.',
+    heroSub:
+      'ComplyHub helps Canadian employers of temporary foreign workers track their regulatory obligations, organize their documents and prepare for IRCC and ESDC inspections — with a multilingual employee portal.',
+    ctaStart: 'Start for free',
+    ctaDemo: 'See the demo (no sign-up)',
+    disclaimer: 'Document management tool — not legal advice (CICC).',
+    featuresTitle: 'Everything you need to stay compliant',
+    pricingTitle: 'Simple pricing',
+    employeePreview: 'Employee portal preview (mock-up)',
+    rights: 'All rights reserved.',
+    start: 'Get started',
+    features: [
+      ['Dashboard', 'See your inspection-readiness score at a glance.'],
+      ['Inspection simulator', 'Answer IRCC/ESDC-style questions and find your weak points.'],
+      ['Document vault', 'Centralize your documents, kept for 6 years (R209.4).'],
+      ['Multilingual employee portal', 'Your workers access their documents and messages in their language.'],
+      ['Time-stamped messaging', 'Communicate with your workers; every exchange is dated as proof.'],
+      ['IRPR-compliant', 'IMP and TFWP compliance conditions, up to date and referenced.'],
+    ],
+    plans: [
+      ['Free', '$0', '', ['1 worker', 'Dashboard', 'Inspection simulator'], 'Get started'],
+      ['Pro', '$49', '/ month', ['Unlimited workers', 'Document vault', 'Employee portal & messaging', 'Automatic alerts'], 'Go Pro'],
+      ['Firm', '$149', '/ month', ['Multi-organization', 'Consultant access (CICC)', 'Priority support'], 'Contact sales'],
+    ],
+  },
+  es: {
+    signin: 'Iniciar sesión',
+    badge: 'Cumplimiento TET · IMP · TFWP',
+    heroTitle: 'Manténgase en regla. Listo para la inspección.',
+    heroSub:
+      'ComplyHub ayuda a los empleadores canadienses de trabajadores extranjeros temporales a seguir sus obligaciones, organizar sus documentos y prepararse para las inspecciones de IRCC y ESDC — con un portal del empleado multilingüe.',
+    ctaStart: 'Comenzar gratis',
+    ctaDemo: 'Ver la demostración (sin registro)',
+    disclaimer: 'Herramienta de gestión documental — no constituye asesoría legal (CICC).',
+    featuresTitle: 'Todo lo necesario para cumplir',
+    pricingTitle: 'Precios simples',
+    employeePreview: 'Vista previa del portal del empleado',
+    rights: 'Todos los derechos reservados.',
+    start: 'Comenzar',
+    features: [
+      ['Panel de control', 'Vea su puntaje de preparación para la inspección de un vistazo.'],
+      ['Simulador de inspección', 'Responda preguntas tipo IRCC/ESDC e identifique sus puntos débiles.'],
+      ['Bóveda documental', 'Centralice sus documentos, conservados 6 años (R209.4).'],
+      ['Portal del empleado multilingüe', 'Sus trabajadores acceden a sus documentos y mensajes en su idioma.'],
+      ['Mensajería con fecha y hora', 'Comuníquese con sus trabajadores; cada intercambio queda registrado como prueba.'],
+      ['Conforme al IRPR', 'Condiciones de cumplimiento IMP y TFWP, actualizadas y referenciadas.'],
+    ],
+    plans: [
+      ['Gratis', '$0', '', ['1 trabajador', 'Panel de control', 'Simulador de inspección'], 'Comenzar'],
+      ['Pro', '$49', '/ mes', ['Trabajadores ilimitados', 'Bóveda documental', 'Portal del empleado y mensajería', 'Alertas automáticas'], 'Pasar a Pro'],
+      ['Firma', '$149', '/ mes', ['Multiorganización', 'Acceso de consultor (CICC)', 'Soporte prioritario'], 'Contactar ventas'],
+    ],
+  },
+  tl: {
+    signin: 'Mag-sign in',
+    badge: 'TFW Compliance · IMP · TFWP',
+    heroTitle: 'Manatiling compliant. Handa sa inspeksyon.',
+    heroSub:
+      'Tinutulungan ng ComplyHub ang mga Canadian employer ng temporary foreign workers na subaybayan ang kanilang mga obligasyon, ayusin ang mga dokumento at maghanda para sa inspeksyon ng IRCC at ESDC — na may multilingual na portal ng empleyado.',
+    ctaStart: 'Magsimula nang libre',
+    ctaDemo: 'Tingnan ang demo (walang sign-up)',
+    disclaimer: 'Kasangkapan sa pamamahala ng dokumento — hindi legal na payo (CICC).',
+    featuresTitle: 'Lahat ng kailangan para maging compliant',
+    pricingTitle: 'Simpleng presyo',
+    employeePreview: 'Preview ng portal ng empleyado',
+    rights: 'Nakalaan ang lahat ng karapatan.',
+    start: 'Magsimula',
+  },
+  pa: {
+    signin: 'ਸਾਈਨ ਇਨ ਕਰੋ',
+    badge: 'TFW ਪਾਲਣਾ · IMP · TFWP',
+    heroTitle: 'ਪਾਲਣਾ ਵਿੱਚ ਰਹੋ। ਜਾਂਚ ਲਈ ਤਿਆਰ।',
+    heroSub:
+      'ComplyHub ਕੈਨੇਡੀਅਨ ਮਾਲਕਾਂ ਦੀ ਆਰਜ਼ੀ ਵਿਦੇਸ਼ੀ ਕਾਮਿਆਂ ਸਬੰਧੀ ਜ਼ਿੰਮੇਵਾਰੀਆਂ ਦੀ ਨਿਗਰਾਨੀ, ਦਸਤਾਵੇਜ਼ ਸੰਭਾਲਣ ਅਤੇ IRCC ਤੇ ESDC ਜਾਂਚ ਦੀ ਤਿਆਰੀ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ — ਬਹੁ-ਭਾਸ਼ਾਈ ਕਰਮਚਾਰੀ ਪੋਰਟਲ ਨਾਲ।',
+    ctaStart: 'ਮੁਫ਼ਤ ਸ਼ੁਰੂ ਕਰੋ',
+    ctaDemo: 'ਡੈਮੋ ਵੇਖੋ (ਰਜਿਸਟਰੇਸ਼ਨ ਤੋਂ ਬਿਨਾਂ)',
+    disclaimer: 'ਦਸਤਾਵੇਜ਼ ਪ੍ਰਬੰਧਨ ਟੂਲ — ਕਾਨੂੰਨੀ ਸਲਾਹ ਨਹੀਂ (CICC)।',
+    featuresTitle: 'ਪਾਲਣਾ ਵਿੱਚ ਰਹਿਣ ਲਈ ਸਭ ਕੁਝ',
+    pricingTitle: 'ਸਧਾਰਨ ਕੀਮਤ',
+    employeePreview: 'ਕਰਮਚਾਰੀ ਪੋਰਟਲ ਝਲਕ',
+    rights: 'ਸਾਰੇ ਹੱਕ ਰਾਖਵੇਂ।',
+    start: 'ਸ਼ੁਰੂ ਕਰੋ',
+  },
+}
+
+/** Contenu de la page d'accueil pour une langue (repli champ par champ sur l'anglais). */
+export function landingContent(lang) {
+  return { ...LANDING.en, ...(LANDING[lang] ?? {}) }
+}

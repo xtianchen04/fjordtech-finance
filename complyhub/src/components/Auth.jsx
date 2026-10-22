@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { ShieldCheck, Loader2 } from 'lucide-react'
 import { signIn, signUp, isSupabaseConfigured } from '../lib/supabase'
+import { useLang } from '../lib/LanguageContext'
+import LanguageSwitcher from './LanguageSwitcher'
 
 // Écran d'authentification (connexion / inscription).
 // Props optionnelles : initialEmail / defaultMode / banner (utilisées par la
 // page d'invitation d'un employé).
 export default function Auth({ onDemo, initialEmail = '', defaultMode = 'login', banner = null }) {
+  const { t } = useLang()
   const [mode, setMode] = useState(defaultMode) // 'login' | 'signup'
   const [email, setEmail] = useState(initialEmail)
   const [password, setPassword] = useState('')
@@ -21,9 +24,7 @@ export default function Auth({ onDemo, initialEmail = '', defaultMode = 'login',
     try {
       if (mode === 'signup') {
         await signUp(email, password)
-        setMessage(
-          'Compte créé. Vérifiez votre boîte courriel pour confirmer votre adresse, puis connectez-vous.',
-        )
+        setMessage(t('au_signup_ok'))
         setMode('login')
       } else {
         await signIn(email, password)
@@ -37,7 +38,10 @@ export default function Auth({ onDemo, initialEmail = '', defaultMode = 'login',
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-ink to-steel p-6">
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-ink to-steel p-6">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher variant="dark" />
+      </div>
       <div className="w-full max-w-md">
         <div className="flex items-center gap-3 justify-center mb-8 text-white">
           <div className="bg-gold rounded-xl p-2.5">
@@ -53,12 +57,10 @@ export default function Auth({ onDemo, initialEmail = '', defaultMode = 'login',
 
         <div className="bg-white rounded-2xl p-7 border border-line shadow-xl">
           <h1 className="font-serif text-2xl font-extrabold mb-1">
-            {mode === 'login' ? 'Connexion' : 'Créer un compte'}
+            {mode === 'login' ? t('au_login_title') : t('au_signup_title')}
           </h1>
           <p className="text-sm text-[#5E7385] mb-6">
-            {mode === 'login'
-              ? 'Accédez à votre tableau de bord de conformité.'
-              : 'Commencez à sécuriser votre dossier de conformité.'}
+            {mode === 'login' ? t('au_login_sub') : t('au_signup_sub')}
           </p>
 
           {banner}
@@ -83,7 +85,7 @@ export default function Auth({ onDemo, initialEmail = '', defaultMode = 'login',
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="field-label" htmlFor="email">
-                Courriel
+                {t('au_email')}
               </label>
               <input
                 id="email"
@@ -98,7 +100,7 @@ export default function Auth({ onDemo, initialEmail = '', defaultMode = 'login',
             </div>
             <div>
               <label className="field-label" htmlFor="password">
-                Mot de passe
+                {t('au_password')}
               </label>
               <input
                 id="password"
@@ -118,14 +120,14 @@ export default function Auth({ onDemo, initialEmail = '', defaultMode = 'login',
 
             <button type="submit" disabled={loading} className="btn-primary w-full">
               {loading && <Loader2 size={16} className="animate-spin" />}
-              {mode === 'login' ? 'Se connecter' : "S'inscrire"}
+              {mode === 'login' ? t('au_login_btn') : t('au_signup_btn')}
             </button>
           </form>
 
           <div className="text-center mt-5 text-[13px] text-[#5E7385]">
             {mode === 'login' ? (
               <>
-                Pas encore de compte ?{' '}
+                {t('au_no_account')}{' '}
                 <button
                   className="text-steel font-semibold hover:underline"
                   onClick={() => {
@@ -134,12 +136,12 @@ export default function Auth({ onDemo, initialEmail = '', defaultMode = 'login',
                     setMessage('')
                   }}
                 >
-                  Créer un compte
+                  {t('au_create_account')}
                 </button>
               </>
             ) : (
               <>
-                Déjà inscrit ?{' '}
+                {t('au_have_account')}{' '}
                 <button
                   className="text-steel font-semibold hover:underline"
                   onClick={() => {
@@ -148,7 +150,7 @@ export default function Auth({ onDemo, initialEmail = '', defaultMode = 'login',
                     setMessage('')
                   }}
                 >
-                  Se connecter
+                  {t('au_login_btn')}
                 </button>
               </>
             )}
