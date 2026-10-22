@@ -8,7 +8,17 @@ import { useLang } from '../lib/LanguageContext'
 // (lieu d'établissement — pilote la veille réglementaire) et les
 // préférences de notification par courriel.
 export default function Settings({ org, onSaved }) {
-  const { t } = useLang()
+  const { t, lang } = useLang()
+  const en = lang === 'en'
+
+  function enableCabinet() {
+    try {
+      localStorage.setItem('complyhub_cabinet', '1')
+    } catch {
+      /* stockage indisponible */
+    }
+    window.location.reload()
+  }
   const [form, setForm] = useState({
     name: org.name ?? '',
     legal_name: org.legal_name ?? '',
@@ -166,6 +176,22 @@ export default function Settings({ org, onSaved }) {
             />
           </div>
         </div>
+      </div>
+
+      {/* Mode cabinet (multi-clients) */}
+      <div className="card">
+        <div className="flex items-center gap-2.5 mb-2">
+          <Building2 size={18} className="text-steel" />
+          <h2 className="text-[15px] font-bold">{en ? 'Firm / multi-client mode' : 'Mode cabinet (multi-clients)'}</h2>
+        </div>
+        <p className="text-[13px] text-[#5E7385] mb-3 leading-relaxed">
+          {en
+            ? 'Manage several employer-clients from one console (CRM portfolio). This organization becomes your first client; you can add more.'
+            : 'Gérez plusieurs employeurs-clients depuis une console (portefeuille CRM). Cette organisation devient votre premier client ; vous pourrez en ajouter d’autres.'}
+        </p>
+        <button type="button" onClick={enableCabinet} className="btn-primary">
+          {en ? 'Open the Firm console' : 'Ouvrir la console Cabinet'}
+        </button>
       </div>
 
       {error && <div className="text-[12.5px] text-danger font-medium">{error}</div>}
