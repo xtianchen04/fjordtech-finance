@@ -3,11 +3,13 @@ import { X, Loader2, Eye, EyeOff, ShieldCheck } from 'lucide-react'
 import { createWorker } from '../lib/api'
 import { PROVINCES, PROGRAMS } from '../lib/constants'
 import { LANGUAGES } from '../lib/i18n'
+import { useLang } from '../lib/LanguageContext'
 import { formatNAS, normalizeNAS, isValidNAS } from '../lib/nas'
 
 // Modal d'ajout d'un travailleur étranger.
 // La création génère automatiquement les conditions de conformité (voir api.createWorker).
 export default function WorkerForm({ orgId, onClose, onCreated }) {
+  const { t } = useLang()
   const [form, setForm] = useState({
     full_name: '',
     program: 'PMI',
@@ -40,7 +42,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
     setError('')
     // Bloque une saisie de NAS manifestement erronée (mais le champ reste facultatif).
     if (nasDigits.length > 0 && !isValidNAS(nasDigits)) {
-      setError('Le NAS saisi est invalide (9 chiffres, validation Luhn). Corrigez-le ou laissez le champ vide.')
+      setError(t('wf_nas_invalid'))
       return
     }
     setLoading(true)
@@ -49,7 +51,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
       onCreated?.(worker)
       onClose?.()
     } catch (err) {
-      setError(err.message ?? "Impossible d'ajouter le travailleur.")
+      setError(err.message ?? t('wf_error'))
     } finally {
       setLoading(false)
     }
@@ -65,7 +67,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-line">
-          <h2 className="font-serif text-lg font-extrabold">Ajouter un travailleur</h2>
+          <h2 className="font-serif text-lg font-extrabold">{t('wf_title')}</h2>
           <button onClick={onClose} className="text-[#7A8FA0] hover:text-ink" aria-label="Fermer">
             <X size={20} />
           </button>
@@ -75,7 +77,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
               <label className="field-label" htmlFor="full_name">
-                Nom complet *
+                {t('wf_full_name')} *
               </label>
               <input
                 id="full_name"
@@ -88,7 +90,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
             </div>
             <div>
               <label className="field-label" htmlFor="program">
-                Programme
+                {t('wf_program')}
               </label>
               <select
                 id="program"
@@ -105,7 +107,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
             </div>
             <div>
               <label className="field-label" htmlFor="occupation">
-                Profession
+                {t('wf_occupation')}
               </label>
               <input
                 id="occupation"
@@ -117,7 +119,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
             </div>
             <div>
               <label className="field-label" htmlFor="work_permit_number">
-                N° de permis de travail
+                {t('wf_permit_number')}
               </label>
               <input
                 id="work_permit_number"
@@ -129,7 +131,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
             </div>
             <div>
               <label className="field-label" htmlFor="social_insurance_number">
-                NAS (Numéro d'assurance sociale)
+                {t('wf_nas')}
               </label>
               <div className="relative">
                 <input
@@ -147,20 +149,20 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
                   type="button"
                   onClick={() => setShowNas((v) => !v)}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9FB0BF] hover:text-steel"
-                  title={showNas ? 'Masquer le NAS' : 'Afficher le NAS'}
-                  aria-label={showNas ? 'Masquer le NAS' : 'Afficher le NAS'}
+                  title={showNas ? t('wf_hide_nas') : t('wf_show_nas')}
+                  aria-label={showNas ? t('wf_hide_nas') : t('wf_show_nas')}
                 >
                   {showNas ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               <p className="mt-1 text-[11px] text-[#7A8FA0] flex items-center gap-1">
                 <ShieldCheck size={12} className="text-steel" />
-                Donnée sensible — masquée par défaut, stockée de façon isolée (RLS).
+                {t('wf_nas_note')}
               </p>
             </div>
             <div>
               <label className="field-label" htmlFor="permit_expiry">
-                Expiration du permis
+                {t('wf_permit_expiry')}
               </label>
               <input
                 id="permit_expiry"
@@ -172,7 +174,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
             </div>
             <div>
               <label className="field-label" htmlFor="offered_wage">
-                Salaire offert ($/h)
+                {t('wf_wage')}
               </label>
               <input
                 id="offered_wage"
@@ -187,7 +189,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
             </div>
             <div>
               <label className="field-label" htmlFor="offered_hours">
-                Heures offertes / sem.
+                {t('wf_hours')}
               </label>
               <input
                 id="offered_hours"
@@ -202,7 +204,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
             </div>
             <div>
               <label className="field-label" htmlFor="work_province">
-                Province de travail
+                {t('wf_work_province')}
               </label>
               <select
                 id="work_province"
@@ -210,7 +212,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
                 value={form.work_province}
                 onChange={(e) => update('work_province', e.target.value)}
               >
-                <option value="">Sélectionner…</option>
+                <option value="">{t('ob_select')}</option>
                 {PROVINCES.map((p) => (
                   <option key={p.code} value={p.code}>
                     {p.name}
@@ -220,7 +222,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
             </div>
             <div>
               <label className="field-label" htmlFor="start_date">
-                Date de début
+                {t('wf_start_date')}
               </label>
               <input
                 id="start_date"
@@ -232,14 +234,12 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
             </div>
 
             <div className="sm:col-span-2 border-t border-mist pt-4 mt-1">
-              <div className="text-[12.5px] font-bold text-steel mb-1">Accès au portail employé</div>
-              <p className="text-[11.5px] text-[#7A8FA0] mb-3">
-                Courriel et langues du travailleur — servent à l'inviter à son portail (facultatif).
-              </p>
+              <div className="text-[12.5px] font-bold text-steel mb-1">{t('wf_portal_section')}</div>
+              <p className="text-[11.5px] text-[#7A8FA0] mb-3">{t('wf_portal_hint')}</p>
             </div>
             <div>
               <label className="field-label" htmlFor="email">
-                Courriel du travailleur
+                {t('wf_email')}
               </label>
               <input
                 id="email"
@@ -252,7 +252,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
             </div>
             <div>
               <label className="field-label" htmlFor="primary_language">
-                Langue principale
+                {t('field_lang_primary')}
               </label>
               <select
                 id="primary_language"
@@ -260,7 +260,7 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
                 value={form.primary_language}
                 onChange={(e) => update('primary_language', e.target.value)}
               >
-                <option value="">Sélectionner…</option>
+                <option value="">{t('ob_select')}</option>
                 {LANGUAGES.map((l) => (
                   <option key={l.code} value={l.code}>
                     {l.label}
@@ -278,11 +278,11 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
               onClick={onClose}
               className="text-[13px] font-semibold text-[#5E7385] px-4 py-2.5 hover:text-ink"
             >
-              Annuler
+              {t('wf_cancel')}
             </button>
             <button type="submit" disabled={loading || !form.full_name} className="btn-primary">
               {loading && <Loader2 size={16} className="animate-spin" />}
-              Ajouter le travailleur
+              {t('wf_submit')}
             </button>
           </div>
         </form>

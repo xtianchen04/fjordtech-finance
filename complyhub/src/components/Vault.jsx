@@ -2,9 +2,13 @@ import { useRef, useState } from 'react'
 import { Lock, Clock, Upload, Download, Trash2, Loader2, FileText, ArrowLeft } from 'lucide-react'
 import { VAULT_FOLDERS } from '../lib/constants'
 import { uploadDocument, deleteDocument, getDocumentUrl } from '../lib/api'
+import { useLang } from '../lib/LanguageContext'
+import { vaultFolderName } from '../lib/i18n'
 
 // Coffre-fort documentaire branché sur Supabase Storage.
 export default function Vault({ orgId, documents = [], workers = [], onChange }) {
+  const { t, lang } = useLang()
+  const folderName = (cat) => vaultFolderName(lang, cat)
   const [openCategory, setOpenCategory] = useState(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -45,7 +49,7 @@ export default function Vault({ orgId, documents = [], workers = [], onChange })
   }
 
   async function handleDelete(doc) {
-    if (!window.confirm(`Supprimer « ${doc.file_name} » ?`)) return
+    if (!window.confirm(t('vt_confirm_delete'))) return
     setBusy(true)
     setError('')
     try {
@@ -66,7 +70,7 @@ export default function Vault({ orgId, documents = [], workers = [], onChange })
           onClick={() => setOpenCategory(null)}
           className="flex items-center gap-1.5 text-[13px] font-semibold text-steel mb-4 hover:text-deep"
         >
-          <ArrowLeft size={16} /> Tous les dossiers
+          <ArrowLeft size={16} /> {t('vt_all_folders')}
         </button>
 
         <div className="card">
@@ -76,8 +80,8 @@ export default function Vault({ orgId, documents = [], workers = [], onChange })
                 <Lock size={19} className="text-steel" />
               </div>
               <div>
-                <div className="text-base font-bold">{folder?.name}</div>
-                <div className="text-[12px] text-[#7A8FA0]">{folderDocs.length} document(s)</div>
+                <div className="text-base font-bold">{folder ? folderName(folder.category) : ''}</div>
+                <div className="text-[12px] text-[#7A8FA0]">{folderDocs.length} {t('vt_documents')}</div>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -87,7 +91,7 @@ export default function Vault({ orgId, documents = [], workers = [], onChange })
                   value={workerId}
                   onChange={(e) => setWorkerId(e.target.value)}
                 >
-                  <option value="">Général (org.)</option>
+                  <option value="">{t('vt_general_org')}</option>
                   {workers.map((w) => (
                     <option key={w.id} value={w.id}>
                       {w.full_name}
@@ -97,7 +101,7 @@ export default function Vault({ orgId, documents = [], workers = [], onChange })
               )}
               <button onClick={() => fileRef.current?.click()} disabled={busy} className="btn-primary">
                 {busy ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                Téléverser
+                {t('vt_upload')}
               </button>
               <input ref={fileRef} type="file" className="hidden" onChange={handleUpload} />
             </div>
@@ -106,9 +110,7 @@ export default function Vault({ orgId, documents = [], workers = [], onChange })
           {error && <div className="text-[12.5px] text-danger font-medium mb-3">{error}</div>}
 
           {folderDocs.length === 0 ? (
-            <p className="text-sm text-[#7A8FA0] py-8 text-center">
-              Aucun document dans ce dossier. Téléversez-en un pour commencer.
-            </p>
+            <p className="text-sm text-[#7A8FA0] py-8 text-center">{t('vt_empty')}</p>
           ) : (
             <div>
               {folderDocs.map((d) => (
@@ -121,7 +123,7 @@ export default function Vault({ orgId, documents = [], workers = [], onChange })
                     <div className="min-w-0">
                       <div className="text-[13.5px] font-semibold truncate">{d.file_name}</div>
                       <div className="text-[11.5px] text-[#9FB0BF]">
-                        Conservé jusqu'au {d.retention_until ?? '—'}
+                        {t('vt_retained_until')} {d.retention_until ?? '—'}
                       </div>
                     </div>
                   </div>
@@ -129,14 +131,14 @@ export default function Vault({ orgId, documents = [], workers = [], onChange })
                     <button
                       onClick={() => handleDownload(d)}
                       className="p-2 text-steel hover:bg-mist rounded-lg"
-                      title="Télécharger"
+                      title={t('vt_download')}
                     >
                       <Download size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(d)}
                       className="p-2 text-danger hover:bg-[#FAE5E8] rounded-lg"
-                      title="Supprimer"
+                      title={t('vt_delete')}
                     >
                       <Trash2 size={16} />
                     </button>
@@ -168,9 +170,9 @@ export default function Vault({ orgId, documents = [], workers = [], onChange })
                 </div>
                 <span className="badge">{count}</span>
               </div>
-              <div className="text-sm font-bold mb-0.5">{f.name}</div>
+              <div className="text-sm font-bold mb-0.5">{folderName(f.category)}</div>
               <div className="text-[12px] text-[#7A8FA0]">
-                {count} document{count > 1 ? 's' : ''}
+                {count} {t('vt_documents')}
               </div>
             </button>
           )
@@ -180,8 +182,7 @@ export default function Vault({ orgId, documents = [], workers = [], onChange })
       <div className="mt-4 bg-mist rounded-2xl px-4 py-3.5 flex items-center gap-3 text-[12.5px] text-deep">
         <Clock size={17} className="text-steel flex-shrink-0" />
         <span>
-          <b>Conservation automatique :</b> tous les documents sont conservés pendant 6 ans,
-          conformément à l'article R209.4 du RIPR.
+          <b>{t('vt_retention_b')}</b> {t('vt_retention')}
         </span>
       </div>
     </div>

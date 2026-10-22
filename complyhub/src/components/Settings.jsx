@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { Loader2, Check, Building2, Bell } from 'lucide-react'
 import { updateOrganization } from '../lib/api'
 import { PROVINCES } from '../lib/constants'
+import { useLang } from '../lib/LanguageContext'
 
 // Paramètres de l'organisation : modifier les coordonnées, la province
 // (lieu d'établissement — pilote la veille réglementaire) et les
 // préférences de notification par courriel.
 export default function Settings({ org, onSaved }) {
+  const { t } = useLang()
   const [form, setForm] = useState({
     name: org.name ?? '',
     legal_name: org.legal_name ?? '',
@@ -53,12 +55,12 @@ export default function Settings({ org, onSaved }) {
       <div className="card">
         <div className="flex items-center gap-2.5 mb-4">
           <Building2 size={18} className="text-steel" />
-          <h2 className="text-[15px] font-bold">Organisation</h2>
+          <h2 className="text-[15px] font-bold">{t('st_org')}</h2>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="field-label" htmlFor="name">Nom commercial *</label>
+            <label className="field-label" htmlFor="name">{t('ob_name')} *</label>
             <input
               id="name"
               required
@@ -68,7 +70,7 @@ export default function Settings({ org, onSaved }) {
             />
           </div>
           <div>
-            <label className="field-label" htmlFor="legal_name">Raison sociale</label>
+            <label className="field-label" htmlFor="legal_name">{t('ob_legal')}</label>
             <input
               id="legal_name"
               className="field-input"
@@ -78,7 +80,7 @@ export default function Settings({ org, onSaved }) {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="field-label" htmlFor="business_number">Numéro d'entreprise</label>
+              <label className="field-label" htmlFor="business_number">{t('ob_business_number')}</label>
               <input
                 id="business_number"
                 className="field-input"
@@ -88,7 +90,7 @@ export default function Settings({ org, onSaved }) {
             </div>
             <div>
               <label className="field-label" htmlFor="province">
-                Province (lieu d'établissement)
+                {t('st_province_estab')}
               </label>
               <select
                 id="province"
@@ -96,18 +98,16 @@ export default function Settings({ org, onSaved }) {
                 value={form.province}
                 onChange={(e) => update('province', e.target.value)}
               >
-                <option value="">Sélectionner…</option>
+                <option value="">{t('ob_select')}</option>
                 {PROVINCES.map((p) => (
                   <option key={p.code} value={p.code}>{p.name}</option>
                 ))}
               </select>
-              <p className="mt-1 text-[11px] text-[#7A8FA0]">
-                Détermine les liens provinciaux affichés dans « Veille réglementaire ».
-              </p>
+              <p className="mt-1 text-[11px] text-[#7A8FA0]">{t('st_province_hint')}</p>
             </div>
           </div>
           <div>
-            <label className="field-label" htmlFor="address">Adresse</label>
+            <label className="field-label" htmlFor="address">{t('ob_address')}</label>
             <input
               id="address"
               className="field-input"
@@ -122,7 +122,7 @@ export default function Settings({ org, onSaved }) {
       <div className="card">
         <div className="flex items-center gap-2.5 mb-4">
           <Bell size={18} className="text-steel" />
-          <h2 className="text-[15px] font-bold">Notifications par courriel</h2>
+          <h2 className="text-[15px] font-bold">{t('st_notif')}</h2>
         </div>
 
         <label className="flex items-start gap-3 cursor-pointer">
@@ -133,18 +133,14 @@ export default function Settings({ org, onSaved }) {
             onChange={(e) => update('notify_enabled', e.target.checked)}
           />
           <span className="text-[13.5px] text-ink">
-            Recevoir un rappel par courriel lorsqu'un permis approche de son expiration ou
-            qu'une condition de conformité est manquante.
-            <span className="block text-[11.5px] text-[#7A8FA0] mt-0.5">
-              L'envoi requiert l'activation du service d'alertes côté serveur (voir la
-              documentation). Sans cela, les alertes restent visibles dans l'application.
-            </span>
+            {t('st_notif_checkbox')}
+            <span className="block text-[11.5px] text-[#7A8FA0] mt-0.5">{t('st_notif_sub')}</span>
           </span>
         </label>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
           <div>
-            <label className="field-label" htmlFor="notify_email">Courriel de destination</label>
+            <label className="field-label" htmlFor="notify_email">{t('st_notif_email')}</label>
             <input
               id="notify_email"
               type="email"
@@ -157,7 +153,7 @@ export default function Settings({ org, onSaved }) {
           </div>
           <div>
             <label className="field-label" htmlFor="alert_window_days">
-              Délai d'alerte avant expiration (jours)
+              {t('st_alert_window')}
             </label>
             <input
               id="alert_window_days"
@@ -177,11 +173,11 @@ export default function Settings({ org, onSaved }) {
       <div className="flex items-center gap-3">
         <button type="submit" disabled={loading || !form.name} className="btn-gold">
           {loading && <Loader2 size={16} className="animate-spin" />}
-          Enregistrer les modifications
+          {t('st_save')}
         </button>
         {saved && !loading && (
           <span className="text-[13px] font-semibold text-ok flex items-center gap-1.5">
-            <Check size={16} /> Enregistré
+            <Check size={16} /> {t('saved')}
           </span>
         )}
       </div>
