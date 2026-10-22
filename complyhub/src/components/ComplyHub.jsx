@@ -8,6 +8,7 @@ import {
   Bell,
   CreditCard,
   Newspaper,
+  MessageSquare,
   Settings as SettingsIcon,
   Users,
   Check,
@@ -37,12 +38,14 @@ import Alerts from './Alerts'
 import Billing from './Billing'
 import RegulatoryUpdates from './RegulatoryUpdates'
 import Settings from './Settings'
+import Messaging from './Messaging'
 import WorkerForm from './WorkerForm'
 import WorkerDetail from './WorkerDetail'
 
 const NAV = [
   { id: 'dashboard', label: 'Tableau de bord', Icon: LayoutDashboard },
   { id: 'alerts', label: 'Alertes', Icon: Bell },
+  { id: 'messaging', label: 'Messagerie', Icon: MessageSquare },
   { id: 'updates', label: 'Veille réglementaire', Icon: Newspaper },
   { id: 'simulator', label: "Simulateur d'inspection", Icon: FileCheck },
   { id: 'vault', label: 'Coffre-fort documentaire', Icon: Lock },
@@ -282,6 +285,7 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
               />
             )}
             {tab === 'alerts' && <Alerts alerts={alerts} />}
+            {tab === 'messaging' && <Messaging orgId={org.id} workers={workers} />}
             {tab === 'updates' && <RegulatoryUpdates org={org} />}
             {tab === 'simulator' && <Simulator orgId={org.id} />}
             {tab === 'vault' && (

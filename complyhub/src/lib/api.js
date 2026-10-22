@@ -147,6 +147,9 @@ export async function createWorker(orgId, payload) {
       work_province: payload.work_province ?? null,
       start_date: payload.start_date || null,
       status: payload.status ?? 'active',
+      email: payload.email || null,
+      primary_language: payload.primary_language || null,
+      secondary_language: payload.secondary_language || null,
     })
     .select()
     .single()
@@ -415,4 +418,178 @@ export async function startCheckout(plan) {
   } else {
     throw new Error('URL de paiement introuvable. Vérifiez la fonction Edge create-checkout.')
   }
+}
+
+// ============================================================
+//  ÉQUIPE & INVITATIONS (côté employeur)
+// ============================================================
+
+/** Liste les invitations d'une organisation (pour afficher le statut d'accès). */
+export async function getInvitations(orgId) {
+  if (isDemo()) return demoStore.getInvitations(orgId)
+  const { data, error } = await supabase
+    .from('invitations')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data ?? []
+}
+
+/**
+ * Invite un travailleur au portail employé : crée une invitation en attente.
+ * Le rattachement du compte se fait à la première connexion de l'employé
+ * (via accept_pending_invitations, par correspondance de courriel vérifié).
+ */
+export async function inviteWorker(orgId, workerId, email) {
+  if (isDemo()) return demoStore.inviteWorker(orgId, workerId, email)
+  const user = await getCurrentUser()
+  if (!user) throw new Error('Aucun utilisateur connecté.')
+
+  // Mémorise le courriel sur la fiche travailleur (utile pour le rattachement).
+  await supabase.from('workers').update({ email }).eq('id', workerId)
+
+  const { data, error } = await supabase
+    .from('invitations')
+    .insert({ org_id: orgId, worker_id: workerId, email, created_by: user.id })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+/** Révoque une invitation (statut 'revoked'). */
+export async function revokeInvitation(invitationId) {
+  if (isDemo()) return demoStore.revokeInvitation(invitationId)
+  const { error } = await supabase
+    .from('invitations')
+    .update({ status: 'revoked' })
+    .eq('id', invitationId)
+  if (error) throw error
+}
+
+/** Infos publiques minimales d'une invitation (page d'invitation, avant connexion). */
+export async function getInvitationInfo(token) {
+  if (isDemo()) return null
+  const { data, error } = await supabase.rpc('invitation_info', { p_token: token })
+  if (error) throw error
+  return data?.[0] ?? null
+}
+
+// ============================================================
+//  CÔTÉ EMPLOYÉ (utilisateur lié à une fiche workers)
+// ============================================================
+
+/** Rattache l'utilisateur connecté à toute invitation en attente visant son courriel. */
+export async function acceptPendingInvitations() {
+  if (isDemo()) return 0
+  const { data, error } = await supabase.rpc('accept_pending_invitations')
+  if (error) throw error
+  return data ?? 0
+}
+
+/** Récupère la fiche travailleur de l'utilisateur connecté (ou null). */
+export async function getMyWorker() {
+  if (isDemo()) return null
+  const user = await getCurrentUser()
+  if (!user) return null
+  const { data, error } = await supabase
+    .from('workers')
+    .select('*')
+    .eq('user_id', user.id)
+    .limit(1)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
+/** L'employé met à jour les champs autorisés de sa propre fiche. */
+export async function updateMyWorkerProfile(patch) {
+  const { data, error } = await supabase.rpc('update_my_worker_profile', {
+    p_primary_language: patch.primary_language ?? null,
+    p_secondary_language: patch.secondary_language ?? null,
+    p_work_permit_number: patch.work_permit_number ?? null,
+    p_permit_expiry: patch.permit_expiry || null,
+  })
+  if (error) throw error
+  return data
+}
+
+/** Documents de l'employé (sa propre fiche uniquement). */
+export async function getMyDocuments(workerId) {
+  const { data, error } = await supabase
+    .from('documents')
+    .select('*')
+    .eq('worker_id', workerId)
+    .order('uploaded_at', { ascending: false })
+  if (error) throw error
+  return data ?? []
+}
+
+// ============================================================
+//  MESSAGERIE (employeur ↔ employé, par travailleur)
+// ============================================================
+
+/** Récupère tous les messages d'une organisation (vue employeur, tous travailleurs). */
+export async function getOrgMessages(orgId) {
+  if (isDemo()) return demoStore.getOrgMessages(orgId)
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return data ?? []
+}
+
+/** Récupère le fil de messages d'un travailleur (ordre chronologique). */
+export async function getMessages(workerId) {
+  if (isDemo()) return demoStore.getMessages(workerId)
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('worker_id', workerId)
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return data ?? []
+}
+
+/**
+ * Envoie un message dans le fil d'un travailleur.
+ * @param {{orgId:string, workerId:string, body:string, role:'employer'|'employee'}} p
+ */
+export async function sendMessage({ orgId, workerId, body, role }) {
+  if (isDemo()) return demoStore.sendMessage({ orgId, workerId, body, role })
+  const user = await getCurrentUser()
+  if (!user) throw new Error('Aucun utilisateur connecté.')
+  const { data, error } = await supabase
+    .from('messages')
+    .insert({
+      org_id: orgId,
+      worker_id: workerId,
+      sender_user_id: user.id,
+      sender_role: role,
+      body,
+    })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+/**
+ * Marque comme lus les messages du fil provenant de l'autre partie.
+ * @param {string} workerId
+ * @param {'employer'|'employee'} readerRole  rôle de celui qui lit
+ */
+export async function markMessagesRead(workerId, readerRole) {
+  if (isDemo()) return demoStore.markMessagesRead(workerId, readerRole)
+  const senderRole = readerRole === 'employer' ? 'employee' : 'employer'
+  const { error } = await supabase
+    .from('messages')
+    .update({ read_at: new Date().toISOString() })
+    .eq('worker_id', workerId)
+    .eq('sender_role', senderRole)
+    .is('read_at', null)
+  if (error) throw error
 }

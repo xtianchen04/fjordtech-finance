@@ -74,7 +74,12 @@ complyhub/
         ├── Simulator.jsx           ← simulateur d'inspection (sauvegardé)
         ├── Vault.jsx               ← coffre-fort documentaire (Supabase Storage)
         ├── Generator.jsx           ← générateur de documents
-        └── Billing.jsx             ← abonnement / Stripe
+        ├── Messaging.jsx           ← messagerie employeur ↔ employé (Phase 2)
+        ├── Billing.jsx             ← abonnement / Stripe
+        └── employee/
+            ├── EmployeePortal.jsx  ← maquette publique (#/employe)
+            ├── EmployeeApp.jsx     ← portail employé authentifié (données réelles)
+            └── InviteLanding.jsx   ← page d'invitation (#/invite?token=…)
 
 supabase/functions/
 ├── create-checkout/index.ts        ← session Stripe Checkout
@@ -84,18 +89,33 @@ supabase/functions/
 ## Modèle de données
 
 - **organizations** — l'entreprise de l'utilisateur (`created_by = auth.uid()`).
-- **workers** — travailleurs étrangers rattachés à une organisation.
+- **workers** — travailleurs étrangers rattachés à une organisation. Colonnes de
+  portail (migration `2026-10_team_messaging.sql`) : `user_id` (compte employé lié),
+  `email`, `primary_language`, `secondary_language`.
 - **compliance_conditions** — référentiel des conditions réglementaires (lecture seule).
 - **worker_compliance** — état de conformité par travailleur × condition.
 - **documents** — métadonnées des fichiers du coffre-fort (Supabase Storage).
+- **invitations** — invitations d'employés au portail (`pending`/`accepted`/`revoked`).
+- **messages** — fil employeur ↔ employé par travailleur ; `read_at` = accusé de
+  lecture (preuve de communication horodatée).
 
-**RLS** : isolation par organisation. Un utilisateur ne voit que les données dont
-l'organisation a `created_by = auth.uid()`.
+**Rôles** :
+- *Employeur* = a créé une organisation (`organizations.created_by = auth.uid()`).
+- *Employé* = utilisateur lié à une fiche via `workers.user_id = auth.uid()`.
+
+**RLS** : isolation par organisation pour l'employeur. Un **employé** n'accède
+qu'à SA fiche, SES documents et SON fil de messages. Le rattachement du compte
+se fait à la connexion via `accept_pending_invitations()` (correspondance du
+courriel vérifié). L'employé modifie ses champs autorisés via
+`update_my_worker_profile()` (SECURITY DEFINER, colonnes sur liste blanche).
 
 ## Flux applicatif
 
 ```
-non connecté → Auth → (pas d'organisation) → Onboarding → Dashboard (ComplyHub)
+non connecté → Auth → employeur : (pas d'org) → Onboarding → ComplyHub
+                        employé  : EmployeeApp (portail)
+lien d'invitation : .../#/invite?token=…  (→ inscription, rattachement auto)
+aperçu public du portail : .../#/employe  (maquette, hors connexion)
 ```
 
 À la création d'un travailleur (`api.createWorker`), les lignes

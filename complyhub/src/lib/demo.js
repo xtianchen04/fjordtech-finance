@@ -58,9 +58,21 @@ function daysFromNow(n) {
 
 // Travailleurs d'exemple.
 const workers = [
-  { id: 'w1', org_id: DEMO_ORG.id, full_name: 'Charles R. Njonou', program: 'PMI', occupation: 'Superviseur', work_permit_number: 'UCI-001', permit_expiry: daysFromNow(420), offered_wage: 24.5, offered_hours: 40, work_province: 'NB', start_date: '2024-03-01', status: 'active' },
-  { id: 'w2', org_id: DEMO_ORG.id, full_name: 'Patrick E. Imoisili', program: 'PMI', occupation: 'Superviseur', work_permit_number: 'UCI-002', permit_expiry: daysFromNow(75), offered_wage: 24.5, offered_hours: 40, work_province: 'NB', start_date: '2024-05-15', status: 'active' },
-  { id: 'w3', org_id: DEMO_ORG.id, full_name: 'Nurudeen T. Ibrahim', program: 'PMI', occupation: 'Superviseur', work_permit_number: 'UCI-003', permit_expiry: daysFromNow(300), offered_wage: 24.5, offered_hours: 40, work_province: 'NB', start_date: '2024-06-01', status: 'active' },
+  { id: 'w1', org_id: DEMO_ORG.id, full_name: 'Charles R. Njonou', program: 'PMI', occupation: 'Superviseur', work_permit_number: 'UCI-001', permit_expiry: daysFromNow(420), offered_wage: 24.5, offered_hours: 40, work_province: 'NB', start_date: '2024-03-01', status: 'active', email: 'charles@exemple.com', primary_language: 'fr', secondary_language: 'en', user_id: 'demo-emp-1' },
+  { id: 'w2', org_id: DEMO_ORG.id, full_name: 'Patrick E. Imoisili', program: 'PMI', occupation: 'Superviseur', work_permit_number: 'UCI-002', permit_expiry: daysFromNow(75), offered_wage: 24.5, offered_hours: 40, work_province: 'NB', start_date: '2024-05-15', status: 'active', email: 'patrick@exemple.com', primary_language: 'en', secondary_language: null, user_id: null },
+  { id: 'w3', org_id: DEMO_ORG.id, full_name: 'Nurudeen T. Ibrahim', program: 'PMI', occupation: 'Superviseur', work_permit_number: 'UCI-003', permit_expiry: daysFromNow(300), offered_wage: 24.5, offered_hours: 40, work_province: 'NB', start_date: '2024-06-01', status: 'active', email: null, primary_language: null, secondary_language: null, user_id: null },
+]
+
+// Invitations d'exemple : w1 a un compte actif, w2 a été invité (en attente).
+let invitations = [
+  { id: 'inv1', org_id: DEMO_ORG.id, worker_id: 'w1', email: 'charles@exemple.com', token: 'demo-token-1', status: 'accepted', created_at: new Date(Date.now() - 6 * 86400000).toISOString(), accepted_at: new Date(Date.now() - 5 * 86400000).toISOString() },
+  { id: 'inv2', org_id: DEMO_ORG.id, worker_id: 'w2', email: 'patrick@exemple.com', token: 'demo-token-2', status: 'pending', created_at: new Date(Date.now() - 86400000).toISOString(), accepted_at: null },
+]
+
+// Fils de messages d'exemple (par travailleur).
+let messages = [
+  { id: 'm1', org_id: DEMO_ORG.id, worker_id: 'w1', sender_user_id: DEMO_USER.id, sender_role: 'employer', body: "Bonjour Charles, merci de téléverser votre permis de conduire avant vendredi.", created_at: new Date(Date.now() - 3 * 3600000).toISOString(), read_at: new Date(Date.now() - 2.5 * 3600000).toISOString() },
+  { id: 'm2', org_id: DEMO_ORG.id, worker_id: 'w1', sender_user_id: 'demo-emp-1', sender_role: 'employee', body: "Bonjour, c'est noté, je l'envoie demain.", created_at: new Date(Date.now() - 2 * 3600000).toISOString(), read_at: null },
 ]
 
 // Statuts par travailleur (clé = condition_id). Tout le reste = 'ok'.
@@ -176,5 +188,60 @@ export const demoStore = {
   },
   async startCheckout() {
     throw new Error('Le paiement Stripe est désactivé en mode démo.')
+  },
+
+  // ---------- Équipe & invitations ----------
+  async getInvitations() {
+    return [...invitations]
+  },
+  async inviteWorker(orgId, workerId, email) {
+    const w = workers.find((x) => x.id === workerId)
+    if (w) w.email = email
+    const inv = {
+      id: uid(),
+      org_id: orgId,
+      worker_id: workerId,
+      email,
+      token: 'demo-' + uid(),
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      accepted_at: null,
+    }
+    invitations = [inv, ...invitations.filter((i) => i.worker_id !== workerId)]
+    return inv
+  },
+  async revokeInvitation(invitationId) {
+    const inv = invitations.find((i) => i.id === invitationId)
+    if (inv) inv.status = 'revoked'
+  },
+
+  // ---------- Messagerie ----------
+  async getOrgMessages(orgId) {
+    return messages.filter((m) => m.org_id === orgId).map((m) => ({ ...m }))
+  },
+  async getMessages(workerId) {
+    return messages.filter((m) => m.worker_id === workerId).map((m) => ({ ...m }))
+  },
+  async sendMessage({ orgId, workerId, body, role }) {
+    const msg = {
+      id: uid(),
+      org_id: orgId,
+      worker_id: workerId,
+      sender_user_id: role === 'employer' ? DEMO_USER.id : 'demo-emp',
+      sender_role: role,
+      body,
+      created_at: new Date().toISOString(),
+      read_at: null,
+    }
+    messages = messages.concat(msg)
+    return msg
+  },
+  async markMessagesRead(workerId, readerRole) {
+    const senderRole = readerRole === 'employer' ? 'employee' : 'employer'
+    for (const m of messages) {
+      if (m.worker_id === workerId && m.sender_role === senderRole && !m.read_at) {
+        m.read_at = new Date().toISOString()
+      }
+    }
   },
 }

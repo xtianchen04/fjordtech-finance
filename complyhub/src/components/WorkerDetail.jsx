@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react'
-import { X, Loader2 } from 'lucide-react'
-import { getWorkerCompliance, updateWorkerCompliance, computeReadinessScore } from '../lib/api'
+import { X, Loader2, UserPlus, Check, Copy, Mail } from 'lucide-react'
+import {
+  getWorkerCompliance,
+  updateWorkerCompliance,
+  computeReadinessScore,
+  getInvitations,
+  inviteWorker,
+  revokeInvitation,
+} from '../lib/api'
 import { STATUS } from '../lib/constants'
 
 const STATUS_OPTIONS = [
@@ -84,6 +91,8 @@ export default function WorkerDetail({ worker, onClose, onChange }) {
         </div>
 
         <div className="p-6">
+          <InviteSection worker={worker} />
+
           {error && <div className="text-[12.5px] text-danger font-medium mb-3">{error}</div>}
           {loading ? (
             <div className="flex items-center gap-2 text-[#5E7385] py-10 justify-center">
@@ -129,6 +138,142 @@ export default function WorkerDetail({ worker, onClose, onChange }) {
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+// ---------- Accès au portail employé (invitation) ----------
+function InviteSection({ worker }) {
+  const [email, setEmail] = useState(worker.email ?? '')
+  const [invitation, setInvitation] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [copied, setCopied] = useState(false)
+  const active = Boolean(worker.user_id) // compte déjà rattaché
+
+  async function load() {
+    try {
+      const all = await getInvitations(worker.org_id)
+      setInvitation(all.find((i) => i.worker_id === worker.id && i.status !== 'revoked') ?? null)
+    } catch {
+      /* table non migrée : on masque la section */
+    } finally {
+      setLoading(false)
+    }
+  }
+  useEffect(() => {
+    load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [worker.id])
+
+  async function invite() {
+    if (!email) return
+    setBusy(true)
+    setError('')
+    try {
+      const inv = await inviteWorker(worker.org_id, worker.id, email)
+      setInvitation(inv)
+    } catch (err) {
+      setError(err.message ?? 'Échec de l’invitation.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function revoke() {
+    if (!invitation) return
+    setBusy(true)
+    try {
+      await revokeInvitation(invitation.id)
+      setInvitation(null)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const inviteLink = invitation
+    ? `${window.location.origin}/#/invite?token=${invitation.token}`
+    : ''
+
+  function copy() {
+    navigator.clipboard?.writeText(inviteLink).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    })
+  }
+
+  if (loading) return null
+
+  return (
+    <div className="bg-paper border border-line rounded-xl p-4 mb-5">
+      <div className="flex items-center justify-between gap-3 mb-2">
+        <div className="text-[13.5px] font-bold flex items-center gap-2">
+          <UserPlus size={15} className="text-steel" /> Accès au portail employé
+        </div>
+        {active ? (
+          <span className="text-[11px] font-bold text-ok bg-[#E6F4EC] px-2.5 py-1 rounded-full flex items-center gap-1">
+            <Check size={12} /> Compte actif
+          </span>
+        ) : invitation ? (
+          <span className="text-[11px] font-bold text-amber bg-[#FBF1DE] px-2.5 py-1 rounded-full">
+            Invité · en attente
+          </span>
+        ) : (
+          <span className="text-[11px] font-bold text-[#7A8FA0] bg-mist px-2.5 py-1 rounded-full">
+            Pas encore invité
+          </span>
+        )}
+      </div>
+
+      {active ? (
+        <p className="text-[12px] text-[#5E7385]">
+          Ce travailleur a activé son compte et peut se connecter à son portail (profil, documents,
+          messages).
+        </p>
+      ) : (
+        <>
+          <p className="text-[12px] text-[#5E7385] mb-3">
+            Invitez le travailleur à son portail. Son accès s’activera lorsqu’il créera son compte
+            avec ce courriel.
+          </p>
+          <div className="flex gap-2 flex-wrap">
+            <div className="relative flex-1 min-w-[200px]">
+              <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9FB0BF]" />
+              <input
+                type="email"
+                className="field-input pl-9"
+                placeholder="nom@exemple.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <button onClick={invite} disabled={busy || !email} className="btn-primary">
+              {busy ? <Loader2 size={15} className="animate-spin" /> : <UserPlus size={15} />}
+              {invitation ? 'Renvoyer' : 'Inviter'}
+            </button>
+          </div>
+
+          {invitation && (
+            <div className="mt-3">
+              <div className="text-[11.5px] text-[#7A8FA0] mb-1">
+                Lien d’invitation à partager (courriel, SMS, WhatsApp…) :
+              </div>
+              <div className="flex gap-2">
+                <input className="field-input text-[12px] flex-1" value={inviteLink} readOnly />
+                <button onClick={copy} className="filter-btn" title="Copier le lien">
+                  {copied ? <Check size={14} className="text-ok" /> : <Copy size={14} />}
+                </button>
+              </div>
+              <button onClick={revoke} className="text-[11.5px] text-danger font-semibold mt-2 hover:underline">
+                Révoquer l’invitation
+              </button>
+            </div>
+          )}
+        </>
+      )}
+
+      {error && <div className="text-[12px] text-danger font-medium mt-2">{error}</div>}
     </div>
   )
 }
