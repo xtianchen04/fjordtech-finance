@@ -129,6 +129,10 @@ export default function Landing({ onStart, onDemo }) {
         <a href="#/employe" className="text-steel font-semibold hover:underline">
           {c.employeePreview}
         </a>
+        <span className="mx-2 text-[#CBD6E0]">·</span>
+        <a href="#/cabinet" className="text-steel font-semibold hover:underline">
+          Console Cabinet (maquette)
+        </a>
         <div className="mt-2">
           © {new Date().getFullYear()} ComplyHub · {c.rights}
         </div>
