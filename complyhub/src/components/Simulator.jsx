@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { FileCheck, Save, Loader2, History } from 'lucide-react'
 import { SIM_QUESTIONS } from '../lib/constants'
 import { saveSimulation, getSimulations } from '../lib/api'
+import { useLang } from '../lib/LanguageContext'
+import { simQuestions } from '../lib/i18n'
 
 const VALUE = { oui: 1, partiel: 0.5, non: 0 }
 const COLORS = { oui: '#2E9E6B', partiel: '#E0A030', non: '#D1495B' }
@@ -13,6 +15,8 @@ function scoreColor(s) {
 // Simulateur d'inspection : l'employeur répond aux questions types d'un inspecteur,
 // puis le résultat est calculé et sauvegardé.
 export default function Simulator({ orgId }) {
+  const { t, lang } = useLang()
+  const questions = simQuestions(lang)
   const [answers, setAnswers] = useState({})
   const [history, setHistory] = useState([])
   const [saving, setSaving] = useState(false)
@@ -59,13 +63,8 @@ export default function Simulator({ orgId }) {
     <div className="max-w-3xl">
       <div className="rounded-2xl p-7 text-white mb-6 bg-gradient-to-br from-deep to-steel">
         <FileCheck size={30} className="text-gold mb-3" />
-        <h2 className="font-serif text-xl font-extrabold mb-1.5">
-          Êtes-vous prêt pour une inspection ?
-        </h2>
-        <p className="text-[13.5px] text-[#CFE0EF] leading-relaxed">
-          Répondez honnêtement à ces questions reproduisant celles d'un inspecteur d'IRCC ou
-          d'ESDC. ComplyHub identifiera vos points faibles avant une vraie inspection.
-        </p>
+        <h2 className="font-serif text-xl font-extrabold mb-1.5">{t('sm_ready_title')}</h2>
+        <p className="text-[13.5px] text-[#CFE0EF] leading-relaxed">{t('sm_ready_desc')}</p>
       </div>
 
       <div className="space-y-3">
@@ -77,19 +76,19 @@ export default function Simulator({ orgId }) {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <span className="text-sm font-semibold">{item.q}</span>
+                  <span className="text-sm font-semibold">{questions[i]?.q ?? item.q}</span>
                   {item.crit && (
                     <span className="text-[9.5px] font-bold text-danger bg-[#FAE5E8] px-1.5 py-0.5 rounded-lg uppercase">
-                      Critique
+                      {t('al_critical')}
                     </span>
                   )}
                 </div>
-                <div className="text-[11.5px] text-[#9FB0BF] mb-3">{item.ref}</div>
+                <div className="text-[11.5px] text-[#9FB0BF] mb-3">{questions[i]?.ref ?? item.ref}</div>
                 <div className="flex gap-2">
                   {[
-                    { key: 'oui', label: 'Oui', bg: '#E6F4EC' },
-                    { key: 'partiel', label: 'Partiellement', bg: '#FBF1DE' },
-                    { key: 'non', label: 'Non', bg: '#FAE5E8' },
+                    { key: 'oui', label: t('sm_yes'), bg: '#E6F4EC' },
+                    { key: 'partiel', label: t('sm_partial'), bg: '#FBF1DE' },
+                    { key: 'non', label: t('sm_no'), bg: '#FAE5E8' },
                   ].map((opt) => (
                     <button
                       key={opt.key}
@@ -121,13 +120,13 @@ export default function Simulator({ orgId }) {
             {currentScore}%
           </div>
           <div className="text-[13px] text-[#5E7385]">
-            {answered}/{SIM_QUESTIONS.length} question(s) répondue(s)
-            {!allAnswered && <div className="text-[11.5px] text-amber">Répondez à tout pour un résultat fiable.</div>}
+            {answered}/{SIM_QUESTIONS.length} {t('sm_answered')}
+            {!allAnswered && <div className="text-[11.5px] text-amber">{t('sm_answer_all')}</div>}
           </div>
         </div>
         <button onClick={handleSave} disabled={saving || answered === 0} className="btn-primary">
           {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          Enregistrer le résultat
+          {t('sm_save_result')}
         </button>
       </div>
 
@@ -136,7 +135,7 @@ export default function Simulator({ orgId }) {
       {history.length > 0 && (
         <div className="card mt-4">
           <div className="flex items-center gap-2 mb-3 text-[15px] font-bold">
-            <History size={17} className="text-steel" /> Historique des simulations
+            <History size={17} className="text-steel" /> {t('sm_history')}
           </div>
           {history.map((h) => (
             <div
@@ -144,7 +143,7 @@ export default function Simulator({ orgId }) {
               className="flex items-center justify-between py-2.5 border-b border-mist last:border-0"
             >
               <span className="text-[13px] text-[#5E7385]">
-                {new Date(h.created_at).toLocaleString('fr-CA')}
+                {new Date(h.created_at).toLocaleString(lang === 'en' ? 'en-CA' : 'fr-CA')}
               </span>
               <span className="font-bold text-sm" style={{ color: scoreColor(h.score) }}>
                 {h.score}%

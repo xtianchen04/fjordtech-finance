@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Loader2, Send, Clock, MessageSquare, ChevronLeft } from 'lucide-react'
 import { getOrgMessages, getMessages, sendMessage, markMessagesRead } from '../lib/api'
+import { useLang } from '../lib/LanguageContext'
 
 // ============================================================
 //  Messagerie employeur ↔ employé (Phase 2).
@@ -17,6 +18,7 @@ function initials(text = '') {
 }
 
 export default function Messaging({ orgId, workers }) {
+  const { t } = useLang()
   const [orgMessages, setOrgMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null) // worker
@@ -51,7 +53,7 @@ export default function Messaging({ orgId, workers }) {
   if (loading) {
     return (
       <div className="flex items-center gap-2 text-[#5E7385] py-16 justify-center">
-        <Loader2 size={18} className="animate-spin" /> Chargement…
+        <Loader2 size={18} className="animate-spin" /> {t('loading')}
       </div>
     )
   }
@@ -60,10 +62,10 @@ export default function Messaging({ orgId, workers }) {
     <div className="card p-0 overflow-hidden flex min-h-[460px]">
       {/* Liste des travailleurs */}
       <div className={`${selected ? 'hidden sm:flex' : 'flex'} flex-col w-full sm:w-[290px] border-r border-line`}>
-        <div className="px-4 py-3 border-b border-line text-[13.5px] font-bold">Conversations</div>
+        <div className="px-4 py-3 border-b border-line text-[13.5px] font-bold">{t('mg_conversations')}</div>
         <div className="flex-1 overflow-y-auto">
           {workers.length === 0 ? (
-            <p className="text-[12.5px] text-[#7A8FA0] p-4">Ajoutez d'abord un travailleur.</p>
+            <p className="text-[12.5px] text-[#7A8FA0] p-4">{t('mg_add_worker_first')}</p>
           ) : (
             workers.map((w) => {
               const info = byWorker[w.id] ?? { last: null, unread: 0 }
@@ -81,7 +83,7 @@ export default function Messaging({ orgId, workers }) {
                   <div className="flex-1 min-w-0">
                     <div className="text-[13px] font-semibold truncate">{w.full_name}</div>
                     <div className="text-[11.5px] text-[#7A8FA0] truncate">
-                      {info.last ? info.last.body : 'Aucun message'}
+                      {info.last ? info.last.body : t('mg_no_message')}
                     </div>
                   </div>
                   {info.unread > 0 && (
@@ -105,11 +107,12 @@ export default function Messaging({ orgId, workers }) {
             worker={selected}
             onBack={() => setSelected(null)}
             onChanged={loadOrg}
+            t={t}
           />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-[#9FB0BF] gap-2">
             <MessageSquare size={30} />
-            <p className="text-[13px]">Sélectionnez un travailleur pour voir la conversation.</p>
+            <p className="text-[13px]">{t('mg_select')}</p>
           </div>
         )}
       </div>
@@ -117,7 +120,7 @@ export default function Messaging({ orgId, workers }) {
   )
 }
 
-function Thread({ orgId, worker, onBack, onChanged }) {
+function Thread({ orgId, worker, onBack, onChanged, t }) {
   const [thread, setThread] = useState([])
   const [loading, setLoading] = useState(true)
   const [body, setBody] = useState('')
@@ -170,18 +173,16 @@ function Thread({ orgId, worker, onBack, onChanged }) {
           <ChevronLeft size={18} />
         </button>
         <div className="text-[13.5px] font-bold">{worker.full_name}</div>
-        <div className="text-[11.5px] text-[#7A8FA0]">· {worker.occupation ?? 'Travailleur'}</div>
+        <div className="text-[11.5px] text-[#7A8FA0]">· {worker.occupation ?? t('d_worker')}</div>
       </div>
 
       <div className="flex-1 p-4 space-y-3 overflow-y-auto max-h-[360px]">
         {loading ? (
           <div className="flex items-center gap-2 text-[#5E7385] py-6 justify-center">
-            <Loader2 size={18} className="animate-spin" /> Chargement…
+            <Loader2 size={18} className="animate-spin" /> {t('loading')}
           </div>
         ) : thread.length === 0 ? (
-          <p className="text-[13px] text-[#7A8FA0] text-center py-6">
-            Aucun message. Écrivez le premier message à ce travailleur.
-          </p>
+          <p className="text-[13px] text-[#7A8FA0] text-center py-6">{t('mg_empty_thread')}</p>
         ) : (
           thread.map((m) => {
             const mine = m.sender_role === 'employer'
@@ -195,7 +196,7 @@ function Thread({ orgId, worker, onBack, onChanged }) {
                   <div className="text-[13.5px] leading-snug whitespace-pre-wrap">{m.body}</div>
                   <div className={`text-[10.5px] mt-1 flex items-center gap-1 ${mine ? 'text-white/70' : 'text-[#7A8FA0]'}`}>
                     <Clock size={10} /> {stamp(m.created_at)}
-                    {mine && m.read_at && <span>· Lu ✓</span>}
+                    {mine && m.read_at && <span>· {t('mg_read')} ✓</span>}
                   </div>
                 </div>
               </div>
@@ -208,12 +209,12 @@ function Thread({ orgId, worker, onBack, onChanged }) {
       <form onSubmit={submit} className="border-t border-line p-3 flex gap-2">
         <input
           className="field-input flex-1"
-          placeholder="Écrire un message…"
+          placeholder={t('mg_write')}
           value={body}
           onChange={(e) => setBody(e.target.value)}
         />
         <button type="submit" disabled={sending || !body.trim()} className="btn-gold !px-4">
-          {sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} Envoyer
+          {sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} {t('mg_send')}
         </button>
       </form>
     </>

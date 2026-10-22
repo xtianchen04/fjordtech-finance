@@ -32,6 +32,7 @@ import {
 } from '../lib/api'
 import { STATUS } from '../lib/constants'
 import { useLang } from '../lib/LanguageContext'
+import { statusLabel } from '../lib/i18n'
 import Gauge from './Gauge'
 import Simulator from './Simulator'
 import Vault from './Vault'
@@ -338,7 +339,8 @@ function DashboardTab({
   onAddWorker,
   onOpenWorker,
 }) {
-  const { t } = useLang()
+  const { t, lang } = useLang()
+  const sLabel = statusLabel(lang)
   if (workers.length === 0) {
     return (
       <div className="card flex flex-col items-center justify-center text-center py-16">
@@ -454,7 +456,7 @@ function DashboardTab({
                 </div>
                 <span className="badge">{cond.regime}</span>
                 <span className="text-xs font-bold min-w-[78px] text-right" style={{ color: s.color }}>
-                  {s.label}
+                  {sLabel[cond.status] ?? s.label}
                 </span>
               </div>
             )

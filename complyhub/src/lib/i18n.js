@@ -131,6 +131,134 @@ const STRINGS = {
     al_none_desc: "Tous vos permis sont valides et aucune condition critique n'est manquante. Continuez le suivi régulier de vos travailleurs.",
     al_critical: 'Critique',
     al_warning: 'Avertissement',
+    // --- Statuts de conformité ---
+    stt_ok: 'Conforme',
+    stt_warn: 'À vérifier',
+    stt_missing: 'Manquant',
+    stt_pending: 'À vérifier',
+    stt_na: 'N/A',
+    // --- Paramètres ---
+    st_org: 'Organisation',
+    st_province_estab: "Province (lieu d'établissement)",
+    st_province_hint: 'Détermine les liens provinciaux affichés dans « Veille réglementaire ».',
+    st_notif: 'Notifications par courriel',
+    st_notif_checkbox: "Recevoir un rappel par courriel lorsqu'un permis approche de son expiration ou qu'une condition de conformité est manquante.",
+    st_notif_sub: "L'envoi requiert l'activation du service d'alertes côté serveur (voir la documentation). Sans cela, les alertes restent visibles dans l'application.",
+    st_notif_email: 'Courriel de destination',
+    st_alert_window: "Délai d'alerte avant expiration (jours)",
+    st_save: 'Enregistrer les modifications',
+    // --- Simulateur ---
+    sm_ready_title: 'Êtes-vous prêt pour une inspection ?',
+    sm_ready_desc: "Répondez honnêtement à ces questions reproduisant celles d'un inspecteur d'IRCC ou d'ESDC. ComplyHub identifiera vos points faibles avant une vraie inspection.",
+    sm_yes: 'Oui',
+    sm_partial: 'Partiellement',
+    sm_no: 'Non',
+    sm_answered: 'question(s) répondue(s)',
+    sm_answer_all: 'Répondez à tout pour un résultat fiable.',
+    sm_save_result: 'Enregistrer le résultat',
+    sm_history: 'Historique des simulations',
+    // --- Coffre-fort ---
+    vt_all_folders: 'Tous les dossiers',
+    vt_general_org: 'Général (org.)',
+    vt_upload: 'Téléverser',
+    vt_empty: 'Aucun document dans ce dossier. Téléversez-en un pour commencer.',
+    vt_retained_until: "Conservé jusqu'au",
+    vt_download: 'Télécharger',
+    vt_delete: 'Supprimer',
+    vt_confirm_delete: 'Supprimer ce document ?',
+    vt_documents: 'document(s)',
+    vt_retention_b: 'Conservation automatique :',
+    vt_retention: "tous les documents sont conservés pendant 6 ans, conformément à l'article R209.4 du RIPR.",
+    // --- Générateur ---
+    gn_worker_label: "Travailleur (pour l'entente d'emploi) :",
+    gn_generate: 'Générer le document',
+    gn_add_worker_first: "Ajoutez d'abord un travailleur",
+    gn_notice_b: 'Avis :',
+    gn_notice: "ComplyHub est un outil de gestion et d'organisation documentaire. Il ne fournit pas de conseil juridique en immigration, lequel est réservé aux avocats et aux consultants réglementés (CICC).",
+    // --- Abonnement ---
+    bl_current_label: 'Palier actuel :',
+    bl_current_desc: 'Choisissez un plan adapté à votre activité.',
+    bl_recommended: 'Recommandé',
+    bl_current_plan: 'Plan actuel',
+    bl_error_suffix: " — assurez-vous que la fonction Edge « create-checkout » est déployée et que les clés Stripe sont configurées.",
+    bl_stripe_note: "Les paiements sont traités de façon sécurisée par Stripe. La gestion de l'abonnement nécessite la configuration des clés Stripe (voir README — section Facturation).",
+    // --- Veille réglementaire ---
+    ru_title: 'Dernières mises à jour réglementaires',
+    ru_desc: "Suivez les normes du travail et les lois d'immigration (IRCC / EDSC) qui touchent vos travailleurs étrangers et leurs droits. Chaque sujet renvoie vers la page officielle du gouvernement, tenue à jour par l'autorité compétente — vous y verrez toujours la dernière version.",
+    ru_desc_prov: "Les liens provinciaux ci-dessous correspondent à votre lieu d'établissement :",
+    ru_federal_title: 'Fédéral — IRCC / EDSC',
+    ru_federal_sub: "S'applique à tous les employeurs de travailleurs étrangers au Canada.",
+    ru_prov_title: 'Provincial / territorial —',
+    ru_prov_sub: "Normes du travail et santé-sécurité de votre province d'établissement.",
+    ru_no_province: "Aucune province d'établissement n'est renseignée pour votre organisation. Ajoutez votre lieu d'établissement dans les paramètres de l'organisation pour recevoir les mises à jour provinciales et territoriales applicables.",
+    ru_footer: "Les liens pointent vers les sites officiels des gouvernements fédéral et provinciaux. Ces pages sont mises à jour par les autorités compétentes. ComplyHub ne fournit pas de conseil juridique en immigration.",
+    ru_no_links: 'Aucun lien disponible pour cette juridiction.',
+    // --- Messagerie ---
+    mg_conversations: 'Conversations',
+    mg_add_worker_first: "Ajoutez d'abord un travailleur.",
+    mg_no_message: 'Aucun message',
+    mg_select: 'Sélectionnez un travailleur pour voir la conversation.',
+    mg_empty_thread: 'Aucun message. Écrivez le premier message à ce travailleur.',
+    mg_write: 'Écrire un message…',
+    mg_send: 'Envoyer',
+    mg_read: 'Lu',
+    // --- Journal d'audit ---
+    ad_subtitle: "Actions horodatées et immuables — preuve en cas d'inspection.",
+    ad_export_pdf: 'Exporter PDF',
+    ad_all_workers: 'Tous les travailleurs',
+    ad_all_actions: 'Toutes les actions',
+    ad_entries: 'entrée(s)',
+    ad_error: "Le journal d'audit n'est pas disponible. Vérifiez que la migration a été appliquée.",
+    ad_empty: 'Aucune entrée pour ces filtres.',
+    ad_col_date: 'Date',
+    ad_col_actor: 'Acteur',
+    ad_col_action: 'Action',
+    ad_col_worker: 'Travailleur',
+    ad_col_detail: 'Détail',
+    ad_role_employer: 'Employeur',
+    ad_role_employee: 'Employé',
+    ad_role_system: 'Système',
+    // --- Fiche d'ajout de travailleur ---
+    wf_title: 'Ajouter un travailleur',
+    wf_full_name: 'Nom complet',
+    wf_program: 'Programme',
+    wf_occupation: 'Profession',
+    wf_permit_number: 'N° de permis de travail',
+    wf_nas: "NAS (Numéro d'assurance sociale)",
+    wf_nas_note: 'Donnée sensible — masquée par défaut, stockée de façon isolée (RLS).',
+    wf_nas_invalid: 'Le NAS saisi est invalide (9 chiffres, validation Luhn). Corrigez-le ou laissez le champ vide.',
+    wf_permit_expiry: 'Expiration du permis',
+    wf_wage: 'Salaire offert ($/h)',
+    wf_hours: 'Heures offertes / sem.',
+    wf_work_province: 'Province de travail',
+    wf_start_date: 'Date de début',
+    wf_portal_section: 'Accès au portail employé',
+    wf_portal_hint: "Courriel et langues du travailleur — servent à l'inviter à son portail (facultatif).",
+    wf_email: 'Courriel du travailleur',
+    wf_cancel: 'Annuler',
+    wf_submit: 'Ajouter le travailleur',
+    wf_error: "Impossible d'ajouter le travailleur.",
+    wf_show_nas: 'Afficher le NAS',
+    wf_hide_nas: 'Masquer le NAS',
+    // --- Détail du travailleur ---
+    wd_permit_exp: 'permis exp.',
+    wd_nas: 'NAS',
+    wd_nas_error: 'Déchiffrement non autorisé ou indisponible.',
+    wd_portal_access: 'Accès au portail employé',
+    wd_account_active: 'Compte actif',
+    wd_invited_pending: 'Invité · en attente',
+    wd_not_invited: 'Pas encore invité',
+    wd_active_desc: 'Ce travailleur a activé son compte et peut se connecter à son portail (profil, documents, messages).',
+    wd_invite_desc: "Invitez le travailleur à son portail. Son accès s'activera lorsqu'il créera son compte avec ce courriel.",
+    wd_invite: 'Inviter',
+    wd_resend: 'Renvoyer',
+    wd_invite_link: "Lien d'invitation à partager (courriel, SMS, WhatsApp…) :",
+    wd_copy: 'Copier le lien',
+    wd_revoke: "Révoquer l'invitation",
+    wd_invite_error: "Échec de l'invitation.",
+    wd_show: 'Afficher',
+    wd_hide: 'Masquer',
+    wd_opt_pending: 'En attente',
   },
   en: {
     portal_name: 'Employee Portal',
@@ -246,6 +374,134 @@ const STRINGS = {
     al_none_desc: 'All your permits are valid and no critical condition is missing. Keep monitoring your workers regularly.',
     al_critical: 'Critical',
     al_warning: 'Warning',
+    // --- Compliance statuses ---
+    stt_ok: 'Compliant',
+    stt_warn: 'To review',
+    stt_missing: 'Missing',
+    stt_pending: 'To review',
+    stt_na: 'N/A',
+    // --- Settings ---
+    st_org: 'Organization',
+    st_province_estab: 'Province (place of business)',
+    st_province_hint: 'Determines the provincial links shown in "Regulatory watch".',
+    st_notif: 'Email notifications',
+    st_notif_checkbox: 'Receive an email reminder when a permit is nearing expiry or a compliance condition is missing.',
+    st_notif_sub: 'Sending requires enabling the server-side alert service (see documentation). Otherwise, alerts remain visible in the app.',
+    st_notif_email: 'Destination email',
+    st_alert_window: 'Alert lead time before expiry (days)',
+    st_save: 'Save changes',
+    // --- Simulator ---
+    sm_ready_title: 'Are you ready for an inspection?',
+    sm_ready_desc: "Answer honestly these questions mirroring an IRCC or ESDC inspector's. ComplyHub will identify your weak points before a real inspection.",
+    sm_yes: 'Yes',
+    sm_partial: 'Partially',
+    sm_no: 'No',
+    sm_answered: 'question(s) answered',
+    sm_answer_all: 'Answer all for a reliable result.',
+    sm_save_result: 'Save result',
+    sm_history: 'Simulation history',
+    // --- Vault ---
+    vt_all_folders: 'All folders',
+    vt_general_org: 'General (org.)',
+    vt_upload: 'Upload',
+    vt_empty: 'No document in this folder. Upload one to get started.',
+    vt_retained_until: 'Retained until',
+    vt_download: 'Download',
+    vt_delete: 'Delete',
+    vt_confirm_delete: 'Delete this document?',
+    vt_documents: 'document(s)',
+    vt_retention_b: 'Automatic retention:',
+    vt_retention: 'all documents are kept for 6 years, per section R209.4 of the IRPR.',
+    // --- Generator ---
+    gn_worker_label: 'Worker (for the employment agreement):',
+    gn_generate: 'Generate document',
+    gn_add_worker_first: 'Add a worker first',
+    gn_notice_b: 'Notice:',
+    gn_notice: 'ComplyHub is a document management tool. It does not provide immigration legal advice, which is reserved for lawyers and regulated consultants (CICC).',
+    // --- Subscription ---
+    bl_current_label: 'Current tier:',
+    bl_current_desc: 'Choose a plan suited to your business.',
+    bl_recommended: 'Recommended',
+    bl_current_plan: 'Current plan',
+    bl_error_suffix: ' — make sure the "create-checkout" Edge Function is deployed and Stripe keys are configured.',
+    bl_stripe_note: 'Payments are processed securely by Stripe. Managing the subscription requires configuring Stripe keys (see README — Billing section).',
+    // --- Regulatory watch ---
+    ru_title: 'Latest regulatory updates',
+    ru_desc: 'Follow labour standards and immigration laws (IRCC / ESDC) affecting your foreign workers and their rights. Each topic links to the official government page, maintained by the competent authority — you will always see the latest version.',
+    ru_desc_prov: 'The provincial links below match your place of business:',
+    ru_federal_title: 'Federal — IRCC / ESDC',
+    ru_federal_sub: 'Applies to all employers of foreign workers in Canada.',
+    ru_prov_title: 'Provincial / territorial —',
+    ru_prov_sub: 'Labour standards and health & safety of your province of business.',
+    ru_no_province: 'No province of business is set for your organization. Add your place of business in the organization settings to receive the applicable provincial and territorial updates.',
+    ru_footer: 'The links point to the official federal and provincial government sites. These pages are maintained by the competent authorities. ComplyHub does not provide immigration legal advice.',
+    ru_no_links: 'No link available for this jurisdiction.',
+    // --- Messaging ---
+    mg_conversations: 'Conversations',
+    mg_add_worker_first: 'Add a worker first.',
+    mg_no_message: 'No message',
+    mg_select: 'Select a worker to see the conversation.',
+    mg_empty_thread: 'No message. Write the first message to this worker.',
+    mg_write: 'Write a message…',
+    mg_send: 'Send',
+    mg_read: 'Read',
+    // --- Audit log ---
+    ad_subtitle: 'Time-stamped, immutable actions — proof for an inspection.',
+    ad_export_pdf: 'Export PDF',
+    ad_all_workers: 'All workers',
+    ad_all_actions: 'All actions',
+    ad_entries: 'entries',
+    ad_error: 'The audit log is unavailable. Check that the migration has been applied.',
+    ad_empty: 'No entry for these filters.',
+    ad_col_date: 'Date',
+    ad_col_actor: 'Actor',
+    ad_col_action: 'Action',
+    ad_col_worker: 'Worker',
+    ad_col_detail: 'Detail',
+    ad_role_employer: 'Employer',
+    ad_role_employee: 'Employee',
+    ad_role_system: 'System',
+    // --- Worker form ---
+    wf_title: 'Add a worker',
+    wf_full_name: 'Full name',
+    wf_program: 'Program',
+    wf_occupation: 'Occupation',
+    wf_permit_number: 'Work permit no.',
+    wf_nas: 'SIN (Social Insurance Number)',
+    wf_nas_note: 'Sensitive data — masked by default, stored in isolation (RLS).',
+    wf_nas_invalid: 'The SIN is invalid (9 digits, Luhn check). Fix it or leave the field empty.',
+    wf_permit_expiry: 'Permit expiry',
+    wf_wage: 'Offered wage ($/h)',
+    wf_hours: 'Offered hours / week',
+    wf_work_province: 'Work province',
+    wf_start_date: 'Start date',
+    wf_portal_section: 'Employee portal access',
+    wf_portal_hint: "Worker's email and languages — used to invite them to their portal (optional).",
+    wf_email: "Worker's email",
+    wf_cancel: 'Cancel',
+    wf_submit: 'Add worker',
+    wf_error: 'Unable to add the worker.',
+    wf_show_nas: 'Show SIN',
+    wf_hide_nas: 'Hide SIN',
+    // --- Worker detail ---
+    wd_permit_exp: 'permit exp.',
+    wd_nas: 'SIN',
+    wd_nas_error: 'Decryption unauthorized or unavailable.',
+    wd_portal_access: 'Employee portal access',
+    wd_account_active: 'Active account',
+    wd_invited_pending: 'Invited · pending',
+    wd_not_invited: 'Not invited yet',
+    wd_active_desc: 'This worker has activated their account and can sign in to their portal (profile, documents, messages).',
+    wd_invite_desc: 'Invite the worker to their portal. Their access activates when they create their account with this email.',
+    wd_invite: 'Invite',
+    wd_resend: 'Resend',
+    wd_invite_link: 'Invitation link to share (email, SMS, WhatsApp…):',
+    wd_copy: 'Copy link',
+    wd_revoke: 'Revoke invitation',
+    wd_invite_error: 'Invitation failed.',
+    wd_show: 'Show',
+    wd_hide: 'Hide',
+    wd_opt_pending: 'Pending',
   },
   es: {
     portal_name: 'Portal del empleado',
@@ -558,4 +814,96 @@ const LANDING = {
 /** Contenu de la page d'accueil pour une langue (repli champ par champ sur l'anglais). */
 export function landingContent(lang) {
   return { ...LANDING.en, ...(LANDING[lang] ?? {}) }
+}
+
+// ============================================================
+//  Contenu piloté par les données (constantes) — traduit par identifiant.
+//  Repli sur l'anglais si la langue manque.
+// ============================================================
+
+/** Libellés des statuts de conformité. */
+export function statusLabel(lang) {
+  const t = makeT(lang)
+  return {
+    ok: t('stt_ok'),
+    warn: t('stt_warn'),
+    missing: t('stt_missing'),
+    pending: t('stt_pending'),
+    na: t('stt_na'),
+  }
+}
+
+const SIM_QUESTIONS_I18N = {
+  fr: [
+    { q: 'Pouvez-vous produire les registres de paie des 6 dernières années pour chaque travailleur ?', ref: 'R209.4 — conservation des documents' },
+    { q: "Les salaires versés correspondent-ils à ceux de l'offre d'emploi ?", ref: 'R209.2(1)(a)(iii) — salaire substantiellement le même' },
+    { q: "Avez-vous fourni au travailleur l'information sur ses droits au Canada ?", ref: 'R209.2(1)(a.1) — depuis le 26 sept. 2022' },
+    { q: "Le travailleur occupe-t-il la même profession que dans l'offre ?", ref: 'R209.2(1)(a)(iii) — même profession' },
+    { q: "Avez-vous une entente d'emploi signée par les deux parties ?", ref: 'R209.11(1)(e) — entente conforme' },
+    { q: "Êtes-vous certain qu'aucuns frais n'ont été facturés au travailleur ?", ref: 'R303.1(1) — interdiction des frais' },
+  ],
+  en: [
+    { q: 'Can you produce payroll records for the past 6 years for each worker?', ref: 'R209.4 — record keeping' },
+    { q: 'Do the wages paid match those in the job offer?', ref: 'R209.2(1)(a)(iii) — substantially the same wage' },
+    { q: 'Have you provided the worker with information about their rights in Canada?', ref: 'R209.2(1)(a.1) — since Sept 26, 2022' },
+    { q: 'Does the worker hold the same occupation as in the offer?', ref: 'R209.2(1)(a)(iii) — same occupation' },
+    { q: 'Do you have an employment agreement signed by both parties?', ref: 'R209.11(1)(e) — compliant agreement' },
+    { q: 'Are you certain no fees were charged to the worker?', ref: 'R303.1(1) — prohibition of fees' },
+  ],
+}
+/** Questions du simulateur (texte + référence) traduites. */
+export function simQuestions(lang) {
+  return SIM_QUESTIONS_I18N[lang] ?? SIM_QUESTIONS_I18N.en
+}
+
+const VAULT_FOLDERS_I18N = {
+  fr: { permit: 'Permis de travail', offer: "Offres d'emploi signées", payroll: 'Registres de paie', contract: 'Contrats de travail', rights: 'Information sur les droits', payments: 'Preuves de versements' },
+  en: { permit: 'Work permits', offer: 'Signed job offers', payroll: 'Payroll records', contract: 'Employment contracts', rights: 'Rights information', payments: 'Proof of payments' },
+}
+/** Nom d'un dossier du coffre-fort par catégorie. */
+export function vaultFolderName(lang, category) {
+  const dict = VAULT_FOLDERS_I18N[lang] ?? VAULT_FOLDERS_I18N.en
+  return dict[category] ?? VAULT_FOLDERS_I18N.en[category] ?? category
+}
+
+const GENERATORS_I18N = {
+  fr: {
+    entente: { t: "Entente d'emploi conforme", d: 'Génère un contrat conforme aux exigences du PMI/PTET (salaire, poste, conditions).' },
+    reponse: { t: "Réponse à un avis d'inspection", d: "Modèle structuré de justification sous l'article R209.2(3) du RIPR." },
+    declaration: { t: 'Lettre de déclaration de changement', d: "Notifie un changement de conditions aux autorités avant qu'il prenne effet." },
+    registre: { t: 'Registre de conformité', d: "Document récapitulatif prêt à présenter lors d'une inspection." },
+  },
+  en: {
+    entente: { t: 'Compliant employment agreement', d: 'Generates a contract compliant with IMP/TFWP requirements (wage, position, conditions).' },
+    reponse: { t: 'Response to an inspection notice', d: 'Structured justification template under section R209.2(3) of the IRPR.' },
+    declaration: { t: 'Change declaration letter', d: 'Notifies authorities of a change in conditions before it takes effect.' },
+    registre: { t: 'Compliance register', d: 'Summary document ready to present during an inspection.' },
+  },
+}
+/** Titre + description d'un modèle du générateur par clé. */
+export function generatorContent(lang, key) {
+  const dict = GENERATORS_I18N[lang] ?? GENERATORS_I18N.en
+  return dict[key] ?? GENERATORS_I18N.en[key] ?? { t: key, d: '' }
+}
+
+const AUDIT_ACTIONS_I18N = {
+  fr: {
+    'insert.workers': 'Travailleur ajouté', 'update.workers': 'Travailleur modifié', 'delete.workers': 'Travailleur supprimé',
+    'insert.worker_compliance': 'Condition initialisée', 'update.worker_compliance': 'Statut de conformité modifié', 'delete.worker_compliance': 'Condition supprimée',
+    'insert.documents': 'Document téléversé', 'update.documents': 'Document modifié', 'delete.documents': 'Document supprimé',
+    'insert.messages': 'Message envoyé', 'update.messages': 'Message lu', 'delete.messages': 'Message supprimé',
+    'insert.invitations': 'Invitation créée', 'update.invitations': 'Invitation mise à jour', 'delete.invitations': 'Invitation supprimée',
+  },
+  en: {
+    'insert.workers': 'Worker added', 'update.workers': 'Worker updated', 'delete.workers': 'Worker deleted',
+    'insert.worker_compliance': 'Condition initialized', 'update.worker_compliance': 'Compliance status changed', 'delete.worker_compliance': 'Condition deleted',
+    'insert.documents': 'Document uploaded', 'update.documents': 'Document updated', 'delete.documents': 'Document deleted',
+    'insert.messages': 'Message sent', 'update.messages': 'Message read', 'delete.messages': 'Message deleted',
+    'insert.invitations': 'Invitation created', 'update.invitations': 'Invitation updated', 'delete.invitations': 'Invitation deleted',
+  },
+}
+/** Libellé lisible d'une action du journal d'audit. */
+export function auditActionLabel(lang, action) {
+  const dict = AUDIT_ACTIONS_I18N[lang] ?? AUDIT_ACTIONS_I18N.en
+  return dict[action] ?? AUDIT_ACTIONS_I18N.en[action] ?? action
 }
