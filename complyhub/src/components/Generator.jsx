@@ -12,7 +12,7 @@ export default function Generator({ org, workers = [], complianceByWorker = {}, 
 
   function handleGenerate(g) {
     const worker = workers.find((w) => w.id === workerId) ?? null
-    generateDocument(g.key, { org, worker, workers, complianceByWorker, score })
+    generateDocument(g.key, { org, worker, workers, complianceByWorker, score, lang })
   }
 
   return (
