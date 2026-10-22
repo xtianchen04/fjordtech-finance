@@ -181,7 +181,11 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
     <div className="flex min-h-screen">
       {/* SIDEBAR */}
       <aside className="w-[248px] bg-ink text-white px-4 py-6 flex flex-col sticky top-0 h-screen flex-shrink-0">
-        <div className="flex items-center gap-3 px-2 pb-6">
+        <button
+          onClick={() => setTab('dashboard')}
+          className="flex items-center gap-3 px-2 pb-6 text-left hover:opacity-90 transition"
+          title="Tableau de bord"
+        >
           <div className="bg-gold rounded-xl p-2 flex items-center justify-center">
             <ShieldCheck size={22} className="text-ink" strokeWidth={2.5} />
           </div>
@@ -193,7 +197,7 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
               Conformité TET · PMI
             </div>
           </div>
-        </div>
+        </button>
 
         <nav className="flex flex-col gap-1">
           {NAV.map(({ id, label, Icon }) => (

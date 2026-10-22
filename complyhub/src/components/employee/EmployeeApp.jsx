@@ -60,17 +60,21 @@ export default function EmployeeApp({ worker: initialWorker, user }) {
     <div className="min-h-screen bg-paper flex flex-col">
       {/* En-tête */}
       <header className="flex items-center justify-between px-5 sm:px-8 py-4 bg-ink text-white">
-        <div className="flex items-center gap-3">
+        <button
+          onClick={() => setTab('profile')}
+          className="flex items-center gap-3 hover:opacity-90 transition"
+          title={t('nav_profile')}
+        >
           <div className="bg-gold rounded-xl p-2">
             <ShieldCheck size={20} className="text-ink" strokeWidth={2.5} />
           </div>
-          <div>
+          <div className="text-left">
             <div className="font-serif font-extrabold text-[17px] leading-none">ComplyHub</div>
             <div className="text-[10px] text-sky font-semibold uppercase tracking-widest mt-1">
               {t('portal_name')}
             </div>
           </div>
-        </div>
+        </button>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 bg-deep rounded-full pl-3 pr-1.5 py-1.5">
             <Globe size={15} className="text-sky" />
@@ -82,7 +86,7 @@ export default function EmployeeApp({ worker: initialWorker, user }) {
             >
               {LANGUAGES.map((l) => (
                 <option key={l.code} value={l.code} className="text-ink">
-                  {l.flag} {l.label}
+                  {l.label}
                 </option>
               ))}
             </select>
