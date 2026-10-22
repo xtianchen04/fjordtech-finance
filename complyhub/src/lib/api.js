@@ -18,19 +18,28 @@ export async function createOrganization(payload) {
   const user = await getCurrentUser()
   if (!user) throw new Error('Aucun utilisateur connecté.')
 
-  const { data, error } = await supabase
-    .from('organizations')
-    .insert({
-      name: payload.name,
-      legal_name: payload.legal_name ?? null,
-      business_number: payload.business_number ?? null,
-      address: payload.address ?? null,
-      province: payload.province ?? null,
-      created_by: user.id,
-    })
-    .select()
-    .single()
+  const core = {
+    name: payload.name,
+    legal_name: payload.legal_name ?? null,
+    business_number: payload.business_number ?? null,
+    address: payload.address ?? null,
+    province: payload.province ?? null,
+    created_by: user.id,
+  }
+  const crm = {
+    client_status: payload.client_status ?? null,
+    contact_name: payload.contact_name ?? null,
+    contact_email: payload.contact_email ?? null,
+    contact_phone: payload.contact_phone ?? null,
+  }
 
+  const insert = (row) => supabase.from('organizations').insert(row).select().single()
+
+  let { data, error } = await insert({ ...core, ...crm })
+  // Migration CRM non appliquée : on réessaie sans les champs CRM.
+  if (error && /column|does not exist|schema cache|client_|contact_/i.test(error.message ?? '')) {
+    ;({ data, error } = await insert(core))
+  }
   if (error) throw error
   return data
 }
@@ -52,8 +61,28 @@ export async function updateOrganization(orgId, patch) {
   const core = pick(['name', 'legal_name', 'business_number', 'address', 'province'])
   // Préférences de notification : colonnes ajoutées par migration (peuvent être absentes).
   const notif = pick(['notify_enabled', 'notify_email', 'alert_window_days'])
+  // Champs CRM (console Cabinet) : colonnes ajoutées par migration (peuvent être absentes).
+  const crm = pick(['client_status', 'contact_name', 'contact_email', 'contact_phone', 'client_notes', 'last_contact_at'])
 
   let result = null
+
+  // Applique un groupe de colonnes « optionnelles » en ignorant l'erreur si la
+  // migration correspondante n'a pas encore été exécutée.
+  async function applyOptional(patchGroup) {
+    if (!Object.keys(patchGroup).length) return
+    const { data, error } = await supabase
+      .from('organizations')
+      .update(patchGroup)
+      .eq('id', orgId)
+      .select()
+      .single()
+    if (error) {
+      const benign = /column|does not exist|schema cache|client_|contact_|notify_|alert_window|last_contact/i.test(error.message ?? '')
+      if (!benign) throw error
+    } else {
+      result = data
+    }
+  }
 
   if (Object.keys(core).length) {
     const { data, error } = await supabase
@@ -66,21 +95,8 @@ export async function updateOrganization(orgId, patch) {
     result = data
   }
 
-  if (Object.keys(notif).length) {
-    const { data, error } = await supabase
-      .from('organizations')
-      .update(notif)
-      .eq('id', orgId)
-      .select()
-      .single()
-    if (error) {
-      // Migration des préférences non appliquée : on ignore plutôt que de tout faire échouer.
-      const benign = /column|notify_|alert_window|does not exist|schema cache/i.test(error.message ?? '')
-      if (!benign) throw error
-    } else {
-      result = data
-    }
-  }
+  await applyOptional(notif)
+  await applyOptional(crm)
 
   if (!result) {
     const { data, error } = await supabase
@@ -92,6 +108,26 @@ export async function updateOrganization(orgId, patch) {
     result = data
   }
   return result
+}
+
+/**
+ * Récupère TOUTES les organisations gérées par l'utilisateur (ordre de création).
+ * Un cabinet/consultant gère plusieurs clients ; un employeur n'en a qu'une.
+ */
+export async function getMyOrganizations() {
+  if (isDemo()) {
+    const o = await demoStore.getMyOrganization()
+    return o ? [o] : []
+  }
+  const user = await getCurrentUser()
+  if (!user) return []
+  const { data, error } = await supabase
+    .from('organizations')
+    .select('*')
+    .eq('created_by', user.id)
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return data ?? []
 }
 
 /** Récupère l'organisation de l'utilisateur connecté (ou null s'il n'en a pas encore). */
