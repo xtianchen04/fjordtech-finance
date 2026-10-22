@@ -1,6 +1,7 @@
 import { supabase, getCurrentUser } from './supabase'
 import { isDemo, demoStore } from './demo'
 import { normalizeNAS } from './nas'
+import { getMinWage } from './minWage'
 
 // ============================================================
 //  Couche d'accès aux données ComplyHub (Supabase / PostgREST)
@@ -388,6 +389,19 @@ export function computeAlerts(workers, complianceByWorker, permitWindowDays = 90
           severity: 'warn',
           title: `Permis bientôt expiré — ${w.full_name}`,
           detail: `Le permis de travail expire dans ${days} jour(s).`,
+        })
+      }
+    }
+
+    // Salaire sous le minimum provincial applicable.
+    if (w.work_province && w.offered_wage != null) {
+      const mw = getMinWage(w.work_province)
+      if (mw && Number(w.offered_wage) < mw.rate) {
+        alerts.push({
+          id: `wage-${w.id}`,
+          severity: 'missing',
+          title: `Salaire sous le minimum — ${w.full_name}`,
+          detail: `Le salaire offert (${Number(w.offered_wage).toFixed(2)} $/h) est inférieur au salaire minimum de ${mw.rate.toFixed(2)} $/h applicable (${w.work_province}). Ajustez la rémunération pour rester conforme.`,
         })
       }
     }
