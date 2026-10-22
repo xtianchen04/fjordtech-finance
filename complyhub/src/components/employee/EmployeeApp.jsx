@@ -16,7 +16,7 @@ import {
   HelpCircle,
 } from 'lucide-react'
 import ResourceCenter from '../ResourceCenter'
-import { LANGUAGES, makeT } from '../../lib/i18n'
+import { LANGUAGES, makeT, isRTL } from '../../lib/i18n'
 import { maskNAS, maskFromLast3 } from '../../lib/nas'
 import { signOut } from '../../lib/supabase'
 import {
@@ -59,7 +59,7 @@ export default function EmployeeApp({ worker: initialWorker, user }) {
   const firstName = (worker.full_name ?? '').split(/\s+/)[0] || ''
 
   return (
-    <div className="min-h-screen bg-paper flex flex-col">
+    <div className="min-h-screen bg-paper flex flex-col" dir={isRTL(lang) ? 'rtl' : 'ltr'}>
       {/* En-tête */}
       <header className="flex items-center justify-between px-5 sm:px-8 py-4 bg-ink text-white">
         <button

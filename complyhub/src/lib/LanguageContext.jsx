@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { makeT } from './i18n'
+import { makeT, isRTL } from './i18n'
 
 // ============================================================
 //  Contexte de langue global (persisté dans localStorage).
@@ -30,9 +30,10 @@ export function LanguageProvider({ children }) {
     }
   }
 
-  // Met à jour l'attribut lang du document (accessibilité / SEO).
+  // Met à jour la langue et la direction (RTL pour l'arabe) du document.
   useEffect(() => {
     document.documentElement.setAttribute('lang', lang)
+    document.documentElement.setAttribute('dir', isRTL(lang) ? 'rtl' : 'ltr')
   }, [lang])
 
   const value = useMemo(() => ({ lang, setLang, t: makeT(lang) }), [lang])
