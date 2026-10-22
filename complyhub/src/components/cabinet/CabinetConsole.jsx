@@ -10,6 +10,8 @@ import {
   Sparkles,
   Bell,
   ShieldCheck,
+  X,
+  ArrowRight,
 } from 'lucide-react'
 import LanguageSwitcher from '../LanguageSwitcher'
 
@@ -52,6 +54,7 @@ const AI_QA = [
 const scoreColor = (s) => (s >= 85 ? '#2E9E6B' : s >= 70 ? '#E0A030' : '#D1495B')
 
 export default function CabinetConsole() {
+  const [client, setClient] = useState(null) // client ouvert (aperçu)
   const totalWorkers = CLIENTS.reduce((s, c) => s + c.workers, 0)
   const totalAlerts = CLIENTS.reduce((s, c) => s + c.alerts, 0)
   const avgScore = Math.round(CLIENTS.reduce((s, c) => s + c.score, 0) / CLIENTS.length)
@@ -115,6 +118,7 @@ export default function CabinetConsole() {
               {CLIENTS.map((c) => (
                 <button
                   key={c.name}
+                  onClick={() => setClient(c)}
                   className="w-full flex items-center gap-3 px-5 py-3.5 border-b border-mist last:border-0 text-left hover:bg-paper transition"
                 >
                   <div className="w-9 h-9 rounded-xl bg-mist text-steel flex items-center justify-center flex-shrink-0">
@@ -169,9 +173,64 @@ export default function CabinetConsole() {
           officielles. ComplyHub ne fournit pas de conseil juridique (CICC).
         </p>
       </div>
+
+      {client && <ClientPreview client={client} onClose={() => setClient(null)} />}
     </div>
   )
 }
+
+// Aperçu d'un client dans la maquette (non connecté) : montre le dossier puis
+// invite à démarrer pour de vrai.
+function ClientPreview({ client, onClose }) {
+  const kpis = [
+    { label: 'Travailleurs', val: client.workers },
+    { label: 'Préparation', val: `${client.score}%`, color: scoreColor(client.score) },
+    { label: 'Alertes', val: client.alerts, color: client.alerts > 0 ? '#D1495B' : '#2E9E6B' },
+  ]
+  return (
+    <div className="fixed inset-0 z-50 bg-ink/50 flex items-start justify-center p-4 overflow-y-auto" onClick={onClose}>
+      <div className="bg-white rounded-2xl w-full max-w-lg my-6 border border-line shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-line">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-mist text-steel flex items-center justify-center font-bold text-[12px]">
+              {initials(client.name)}
+            </div>
+            <div>
+              <div className="font-serif text-lg font-extrabold leading-none">{client.name}</div>
+              <div className="text-[11.5px] text-[#7A8FA0] mt-1">{client.prov}</div>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-[#7A8FA0] hover:text-ink" aria-label="Fermer">
+            <X size={20} />
+          </button>
+        </div>
+        <div className="p-6">
+          <div className="flex gap-3 mb-5">
+            {kpis.map((k) => (
+              <div key={k.label} className="flex-1 bg-paper border border-line rounded-xl px-4 py-3 text-center">
+                <div className="text-xl font-extrabold font-serif" style={{ color: k.color ?? '#0B1F33' }}>{k.val}</div>
+                <div className="text-[11.5px] text-[#5E7385] mt-0.5">{k.label}</div>
+              </div>
+            ))}
+          </div>
+          <div className="bg-mist rounded-xl px-4 py-3.5 text-[13px] text-deep leading-relaxed">
+            Ceci est un <b>aperçu de démonstration</b>. Dans la vraie console Cabinet, ouvrir un
+            client donne accès à son <b>tableau de bord complet</b> : travailleurs, conformité,
+            documents, messagerie et journal d'audit.
+          </div>
+          <a href="#/" className="btn-gold w-full mt-5">
+            Commencer pour de vrai <ArrowRight size={16} />
+          </a>
+          <p className="text-[11.5px] text-[#9FB0BF] text-center mt-3">
+            Inscrivez-vous et cochez « Je suis un cabinet » pour gérer de vrais dossiers.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const initials = (t = '') => t.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join('')
 
 function AiAssistant() {
   const [thread, setThread] = useState([
