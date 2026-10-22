@@ -10,6 +10,7 @@ import {
   Newspaper,
   MessageSquare,
   ScrollText,
+  HelpCircle,
   Settings as SettingsIcon,
   Users,
   Check,
@@ -43,6 +44,7 @@ import RegulatoryUpdates from './RegulatoryUpdates'
 import Settings from './Settings'
 import Messaging from './Messaging'
 import AuditLog from './AuditLog'
+import ResourceCenter from './ResourceCenter'
 import WorkerForm from './WorkerForm'
 import WorkerDetail from './WorkerDetail'
 
@@ -51,6 +53,7 @@ const NAV = [
   { id: 'alerts', key: 'd_nav_alerts', Icon: Bell },
   { id: 'messaging', key: 'd_nav_messaging', Icon: MessageSquare },
   { id: 'updates', key: 'd_nav_updates', Icon: Newspaper },
+  { id: 'resources', key: 'd_nav_resources', Icon: HelpCircle },
   { id: 'simulator', key: 'd_nav_simulator', Icon: FileCheck },
   { id: 'vault', key: 'd_nav_vault', Icon: Lock },
   { id: 'generator', key: 'd_nav_generator', Icon: FileText },
@@ -294,6 +297,7 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
             {tab === 'alerts' && <Alerts alerts={alerts} />}
             {tab === 'messaging' && <Messaging orgId={org.id} workers={workers} />}
             {tab === 'updates' && <RegulatoryUpdates org={org} />}
+            {tab === 'resources' && <ResourceCenter kind="employer" province={org.province} />}
             {tab === 'simulator' && <Simulator orgId={org.id} />}
             {tab === 'vault' && (
               <Vault orgId={org.id} documents={documents} workers={workers} onChange={reloadDocuments} />
