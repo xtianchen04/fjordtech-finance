@@ -220,3 +220,137 @@ export function generateDocument(key, ctx = {}) {
 }
 
 export { STATUS_FR }
+
+// ============================================================
+//  Fiche d'information sur les droits (portail employé, multilingue)
+//  Support de l'obligation R209.2(1)(a.1) : informer le travailleur de
+//  ses droits. Contenu traduit ; repli sur l'anglais si la langue manque.
+// ============================================================
+
+const RIGHTS = {
+  fr: {
+    dir: 'ltr',
+    title: 'Information sur vos droits au Canada',
+    intro:
+      "En tant que travailleur étranger temporaire, vous avez des droits protégés par la loi canadienne. Votre employeur est tenu de vous en informer (RIPR, R209.2).",
+    items: [
+      ['Salaire équitable', "Vous devez être payé le salaire indiqué dans votre offre d'emploi, et à temps."],
+      ['Milieu sans abus', "Vous avez droit à un milieu de travail exempt de mauvais traitements, de harcèlement et de représailles (R196.2)."],
+      ['Aucuns frais', "Aucuns frais de recrutement ne peuvent vous être facturés (R303.1)."],
+      ['Vos documents', "Votre passeport et votre permis de travail vous appartiennent. Personne ne peut les confisquer."],
+      ['Soins de santé', "Vous avez droit à des soins de santé en cas de blessure ou de maladie liée au travail."],
+      ['Changer d’emploi', "Vous pouvez quitter un emploi ou un employeur abusif. Un permis ouvert pour travailleur vulnérable peut être disponible."],
+    ],
+    help: 'Besoin d’aide ? Service de confiance : composez le 2-1-1, ou communiquez avec un centre d’aide aux travailleurs migrants. Urgence : 9-1-1.',
+    footer: 'Document d’information — ne constitue pas un conseil juridique.',
+  },
+  en: {
+    dir: 'ltr',
+    title: 'Information about your rights in Canada',
+    intro:
+      'As a temporary foreign worker, you have rights protected by Canadian law. Your employer must inform you of them (IRPR, R209.2).',
+    items: [
+      ['Fair wages', 'You must be paid the wage stated in your job offer, and on time.'],
+      ['Abuse-free workplace', 'You have the right to a workplace free from mistreatment, harassment and reprisal (R196.2).'],
+      ['No fees', 'You cannot be charged recruitment fees (R303.1).'],
+      ['Your documents', 'Your passport and work permit belong to you. No one may take them away.'],
+      ['Health care', 'You are entitled to health care for a work-related injury or illness.'],
+      ['Changing jobs', 'You can leave an abusive job or employer. An open work permit for vulnerable workers may be available.'],
+    ],
+    help: 'Need help? Trusted service: dial 2-1-1, or contact a migrant worker support centre. Emergency: 9-1-1.',
+    footer: 'Information document — not legal advice.',
+  },
+  es: {
+    dir: 'ltr',
+    title: 'Información sobre sus derechos en Canadá',
+    intro:
+      'Como trabajador extranjero temporal, usted tiene derechos protegidos por la ley canadiense. Su empleador debe informarle de ellos (IRPR, R209.2).',
+    items: [
+      ['Salario justo', 'Debe recibir el salario indicado en su oferta de empleo, y a tiempo.'],
+      ['Lugar sin abuso', 'Tiene derecho a un lugar de trabajo libre de maltrato, acoso y represalias (R196.2).'],
+      ['Sin cobros', 'No se le pueden cobrar honorarios de reclutamiento (R303.1).'],
+      ['Sus documentos', 'Su pasaporte y permiso de trabajo le pertenecen. Nadie puede quitárselos.'],
+      ['Atención médica', 'Tiene derecho a atención médica por una lesión o enfermedad relacionada con el trabajo.'],
+      ['Cambiar de empleo', 'Puede dejar un empleo o empleador abusivo. Puede existir un permiso abierto para trabajadores vulnerables.'],
+    ],
+    help: '¿Necesita ayuda? Servicio de confianza: marque 2-1-1, o contacte un centro de apoyo a trabajadores migrantes. Emergencia: 9-1-1.',
+    footer: 'Documento informativo — no constituye asesoría legal.',
+  },
+  tl: {
+    dir: 'ltr',
+    title: 'Impormasyon tungkol sa inyong mga karapatan sa Canada',
+    intro:
+      'Bilang temporary foreign worker, may mga karapatan kayong protektado ng batas ng Canada. Dapat kayong ipaalam ng inyong employer (IRPR, R209.2).',
+    items: [
+      ['Patas na sahod', 'Dapat kayong bayaran ng sahod na nasa job offer ninyo, at sa tamang oras.'],
+      ['Ligtas na trabaho', 'May karapatan kayo sa lugar ng trabaho na walang pang-aabuso, panliligalig o paghihiganti (R196.2).'],
+      ['Walang bayad', 'Hindi kayo maaaring singilin ng recruitment fees (R303.1).'],
+      ['Inyong dokumento', 'Ang inyong pasaporte at work permit ay pag-aari ninyo. Walang maaaring kumuha nito.'],
+      ['Pangangalagang pangkalusugan', 'May karapatan kayo sa pangangalagang pangkalusugan para sa pinsala o sakit na dulot ng trabaho.'],
+      ['Pagpalit ng trabaho', 'Maaari ninyong iwan ang mapang-abusong trabaho o employer. May open work permit para sa vulnerable workers.'],
+    ],
+    help: 'Kailangan ng tulong? Mapagkakatiwalaang serbisyo: i-dial ang 2-1-1, o makipag-ugnayan sa migrant worker support centre. Emergency: 9-1-1.',
+    footer: 'Dokumentong pang-impormasyon — hindi legal na payo.',
+  },
+  pa: {
+    dir: 'ltr',
+    title: 'ਕੈਨੇਡਾ ਵਿੱਚ ਤੁਹਾਡੇ ਹੱਕਾਂ ਬਾਰੇ ਜਾਣਕਾਰੀ',
+    intro:
+      'ਇੱਕ ਆਰਜ਼ੀ ਵਿਦੇਸ਼ੀ ਕਾਮੇ ਵਜੋਂ, ਤੁਹਾਡੇ ਹੱਕ ਕੈਨੇਡੀਅਨ ਕਾਨੂੰਨ ਦੁਆਰਾ ਸੁਰੱਖਿਅਤ ਹਨ। ਤੁਹਾਡਾ ਮਾਲਕ ਤੁਹਾਨੂੰ ਇਹ ਦੱਸਣ ਲਈ ਪਾਬੰਦ ਹੈ (IRPR, R209.2)।',
+    items: [
+      ['ਨਿਆਂਪੂਰਨ ਤਨਖਾਹ', 'ਤੁਹਾਨੂੰ ਨੌਕਰੀ ਦੀ ਪੇਸ਼ਕਸ਼ ਵਿੱਚ ਦਿੱਤੀ ਤਨਖਾਹ ਸਮੇਂ ਸਿਰ ਮਿਲਣੀ ਚਾਹੀਦੀ ਹੈ।'],
+      ['ਦੁਰਵਿਹਾਰ-ਮੁਕਤ ਥਾਂ', 'ਤੁਹਾਨੂੰ ਦੁਰਵਿਹਾਰ, ਤੰਗ-ਪ੍ਰੇਸ਼ਾਨੀ ਅਤੇ ਬਦਲੇ ਤੋਂ ਮੁਕਤ ਕੰਮ ਵਾਲੀ ਥਾਂ ਦਾ ਹੱਕ ਹੈ (R196.2)।'],
+      ['ਕੋਈ ਫੀਸ ਨਹੀਂ', 'ਤੁਹਾਡੇ ਤੋਂ ਭਰਤੀ ਦੀ ਕੋਈ ਫੀਸ ਨਹੀਂ ਲਈ ਜਾ ਸਕਦੀ (R303.1)।'],
+      ['ਤੁਹਾਡੇ ਦਸਤਾਵੇਜ਼', 'ਤੁਹਾਡਾ ਪਾਸਪੋਰਟ ਅਤੇ ਵਰਕ ਪਰਮਿਟ ਤੁਹਾਡਾ ਹੈ। ਕੋਈ ਵੀ ਇਸਨੂੰ ਖੋਹ ਨਹੀਂ ਸਕਦਾ।'],
+      ['ਸਿਹਤ ਸੰਭਾਲ', 'ਕੰਮ ਨਾਲ ਜੁੜੀ ਸੱਟ ਜਾਂ ਬਿਮਾਰੀ ਲਈ ਤੁਹਾਨੂੰ ਸਿਹਤ ਸੰਭਾਲ ਦਾ ਹੱਕ ਹੈ।'],
+      ['ਨੌਕਰੀ ਬਦਲਣਾ', 'ਤੁਸੀਂ ਦੁਰਵਿਹਾਰ ਕਰਨ ਵਾਲੀ ਨੌਕਰੀ ਜਾਂ ਮਾਲਕ ਨੂੰ ਛੱਡ ਸਕਦੇ ਹੋ। ਕਮਜ਼ੋਰ ਕਾਮਿਆਂ ਲਈ ਓਪਨ ਵਰਕ ਪਰਮਿਟ ਮਿਲ ਸਕਦਾ ਹੈ।'],
+    ],
+    help: 'ਮਦਦ ਚਾਹੀਦੀ ਹੈ? ਭਰੋਸੇਯੋਗ ਸੇਵਾ: 2-1-1 ਡਾਇਲ ਕਰੋ, ਜਾਂ ਪ੍ਰਵਾਸੀ ਕਾਮੇ ਸਹਾਇਤਾ ਕੇਂਦਰ ਨਾਲ ਸੰਪਰਕ ਕਰੋ। ਐਮਰਜੈਂਸੀ: 9-1-1।',
+    footer: 'ਜਾਣਕਾਰੀ ਦਸਤਾਵੇਜ਼ — ਕਾਨੂੰਨੀ ਸਲਾਹ ਨਹੀਂ।',
+  },
+}
+
+/**
+ * Construit la fiche d'information sur les droits (HTML imprimable).
+ * @param {{worker?:object, lang?:string}} ctx
+ * @returns {string} HTML complet
+ */
+export function buildRightsSheet({ worker, lang = 'fr' } = {}) {
+  const r = RIGHTS[lang] ?? RIGHTS.en
+  const name = esc(worker?.full_name ?? '')
+  const items = r.items
+    .map(([h, d]) => `<h2>${esc(h)}</h2><p>${esc(d)}</p>`)
+    .join('')
+  return `<!DOCTYPE html>
+<html lang="${lang}" dir="${r.dir}"><head><meta charset="UTF-8"><title>${esc(r.title)}</title>
+<style>
+  @page { margin: 2cm; }
+  body { font-family: Georgia, serif; color: #0B1F33; line-height: 1.6; max-width: 760px; margin: 0 auto; padding: 28px; }
+  header { border-bottom: 3px solid #C99A3B; padding-bottom: 14px; margin-bottom: 22px; }
+  .brand { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #2E6CA4; font-weight: bold; }
+  h1 { font-size: 22px; margin: 6px 0 2px; }
+  h2 { font-size: 15px; margin: 18px 0 2px; color: #13314F; }
+  p, li { font-size: 13.5px; }
+  .intro { color: #5E7385; }
+  .help { margin-top: 24px; background: #E8F1F8; border-radius: 10px; padding: 14px 16px; font-size: 13px; }
+  .meta { font-size: 11px; color: #7A8FA0; margin-top: 26px; }
+  .toolbar { background:#0B1F33;color:#fff;padding:10px 14px;border-radius:8px;margin-bottom:20px;font-family:sans-serif;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:12px; }
+  .toolbar button { background:#C99A3B;color:#0B1F33;border:0;border-radius:6px;padding:7px 14px;font-weight:bold;cursor:pointer; }
+  @media print { .toolbar { display:none; } body { padding:0; } }
+</style></head>
+<body>
+  <div class="toolbar">
+    <span>ComplyHub</span>
+    <button onclick="window.print()">${lang === 'en' ? 'Print / PDF' : 'Imprimer / PDF'}</button>
+  </div>
+  <header>
+    <div class="brand">ComplyHub</div>
+    <h1>${esc(r.title)}</h1>
+    ${name ? `<div class="org">${name}</div>` : ''}
+  </header>
+  <p class="intro">${esc(r.intro)}</p>
+  ${items}
+  <div class="help">${esc(r.help)}</div>
+  <div class="meta">${esc(r.footer)}</div>
+</body></html>`
+}

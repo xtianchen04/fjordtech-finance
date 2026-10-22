@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, Loader2, Eye, EyeOff, ShieldCheck } from 'lucide-react'
 import { createWorker } from '../lib/api'
 import { PROVINCES, PROGRAMS } from '../lib/constants'
+import { LANGUAGES } from '../lib/i18n'
 import { formatNAS, normalizeNAS, isValidNAS } from '../lib/nas'
 
 // Modal d'ajout d'un travailleur étranger.
@@ -18,6 +19,9 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
     offered_hours: '',
     work_province: '',
     start_date: '',
+    email: '',
+    primary_language: '',
+    secondary_language: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -225,6 +229,44 @@ export default function WorkerForm({ orgId, onClose, onCreated }) {
                 value={form.start_date}
                 onChange={(e) => update('start_date', e.target.value)}
               />
+            </div>
+
+            <div className="sm:col-span-2 border-t border-mist pt-4 mt-1">
+              <div className="text-[12.5px] font-bold text-steel mb-1">Accès au portail employé</div>
+              <p className="text-[11.5px] text-[#7A8FA0] mb-3">
+                Courriel et langues du travailleur — servent à l'inviter à son portail (facultatif).
+              </p>
+            </div>
+            <div>
+              <label className="field-label" htmlFor="email">
+                Courriel du travailleur
+              </label>
+              <input
+                id="email"
+                type="email"
+                className="field-input"
+                value={form.email}
+                onChange={(e) => update('email', e.target.value)}
+                placeholder="nom@exemple.com"
+              />
+            </div>
+            <div>
+              <label className="field-label" htmlFor="primary_language">
+                Langue principale
+              </label>
+              <select
+                id="primary_language"
+                className="field-input"
+                value={form.primary_language}
+                onChange={(e) => update('primary_language', e.target.value)}
+              >
+                <option value="">Sélectionner…</option>
+                {LANGUAGES.map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

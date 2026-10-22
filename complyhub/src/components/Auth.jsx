@@ -3,9 +3,11 @@ import { ShieldCheck, Loader2 } from 'lucide-react'
 import { signIn, signUp, isSupabaseConfigured } from '../lib/supabase'
 
 // Écran d'authentification (connexion / inscription).
-export default function Auth({ onDemo }) {
-  const [mode, setMode] = useState('login') // 'login' | 'signup'
-  const [email, setEmail] = useState('')
+// Props optionnelles : initialEmail / defaultMode / banner (utilisées par la
+// page d'invitation d'un employé).
+export default function Auth({ onDemo, initialEmail = '', defaultMode = 'login', banner = null }) {
+  const [mode, setMode] = useState(defaultMode) // 'login' | 'signup'
+  const [email, setEmail] = useState(initialEmail)
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -58,6 +60,8 @@ export default function Auth({ onDemo }) {
               ? 'Accédez à votre tableau de bord de conformité.'
               : 'Commencez à sécuriser votre dossier de conformité.'}
           </p>
+
+          {banner}
 
           {!isSupabaseConfigured && (
             <div className="mb-5 text-[12.5px] bg-[#FBF1DE] text-[#7A5B17] rounded-xl px-4 py-3 leading-snug">
