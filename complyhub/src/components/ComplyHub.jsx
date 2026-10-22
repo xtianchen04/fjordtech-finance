@@ -74,7 +74,7 @@ function initials(text = '') {
     .join('')
 }
 
-export default function ComplyHub({ org: orgProp, user, demo = false }) {
+export default function ComplyHub({ org: orgProp, user, demo = false, onBack = null }) {
   // Copie locale de l'organisation : mise à jour immédiate après l'écran Paramètres
   // (en-tête, veille réglementaire, fenêtre d'alerte…).
   const { t } = useLang()
@@ -190,6 +190,14 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
     <div className="flex min-h-screen">
       {/* SIDEBAR */}
       <aside className="w-[248px] bg-ink text-white px-4 py-6 flex flex-col sticky top-0 h-screen flex-shrink-0">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1.5 text-[12.5px] font-semibold text-[#9FB8CE] hover:text-white mb-3 px-2"
+          >
+            <ChevronRight size={15} className="rotate-180" /> Clients
+          </button>
+        )}
         <button
           onClick={() => setTab('dashboard')}
           className="flex items-center gap-3 px-2 pb-6 text-left hover:opacity-90 transition"

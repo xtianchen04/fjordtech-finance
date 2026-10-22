@@ -18,6 +18,7 @@ export default function Onboarding({ onCreated }) {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [cabinet, setCabinet] = useState(false)
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
@@ -28,6 +29,12 @@ export default function Onboarding({ onCreated }) {
     setError('')
     setLoading(true)
     try {
+      // Mode cabinet : on mémorise la préférence avant de créer le 1er client.
+      try {
+        if (cabinet) localStorage.setItem('complyhub_cabinet', '1')
+      } catch {
+        /* stockage indisponible */
+      }
       const org = await createOrganization(form)
       onCreated?.(org)
     } catch (err) {
@@ -134,6 +141,22 @@ export default function Onboarding({ onCreated }) {
                 placeholder="123 rue Principale, Moncton, NB"
               />
             </div>
+
+            <label className="flex items-start gap-3 cursor-pointer border-t border-mist pt-4">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 accent-steel"
+                checked={cabinet}
+                onChange={(e) => setCabinet(e.target.checked)}
+              />
+              <span className="text-[13px] text-ink">
+                Je suis un cabinet / consultant et je gère plusieurs employeurs-clients.
+                <span className="block text-[11.5px] text-[#7A8FA0] mt-0.5">
+                  Ouvre la console Cabinet (portefeuille multi-clients). Vous pourrez ajouter
+                  d'autres clients ensuite.
+                </span>
+              </span>
+            </label>
 
             {error && <div className="text-[12.5px] text-danger font-medium">{error}</div>}
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { onAuthChange, getCurrentUser } from './lib/supabase'
-import { getMyOrganization, getMyWorker, acceptPendingInvitations } from './lib/api'
+import { getMyOrganizations, getMyWorker, acceptPendingInvitations } from './lib/api'
 import { enableDemo, DEMO_ORG, DEMO_USER } from './lib/demo'
 import Landing from './components/Landing'
 import Auth from './components/Auth'
@@ -11,6 +11,7 @@ import EmployeePortal from './components/employee/EmployeePortal'
 import EmployeeApp from './components/employee/EmployeeApp'
 import InviteLanding from './components/employee/InviteLanding'
 import CabinetConsole from './components/cabinet/CabinetConsole'
+import CabinetDashboard from './components/cabinet/CabinetDashboard'
 
 // Découpe l'ancre « #/chemin?clé=valeur » en { path, params }.
 function parseHash(h) {
@@ -24,7 +25,7 @@ function parseHash(h) {
 export default function App() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
-  const [org, setOrg] = useState(null)
+  const [orgs, setOrgs] = useState([]) // organisations gérées (1 = employeur, ≥2 = cabinet)
   const [worker, setWorker] = useState(null) // fiche liée si l'utilisateur est un employé
   const [showAuth, setShowAuth] = useState(false) // bascule Landing → Auth
   const [demo, setDemo] = useState(false) // mode démo (sans Supabase)
@@ -45,9 +46,9 @@ export default function App() {
   // ou employé (fiche travailleur liée via une invitation acceptée).
   async function resolveRole() {
     try {
-      const o = await getMyOrganization()
-      if (o) {
-        setOrg(o)
+      const os = await getMyOrganizations()
+      if (os.length > 0) {
+        setOrgs(os)
         setWorker(null)
         return
       }
@@ -59,10 +60,10 @@ export default function App() {
         /* ignoré : table non migrée ou aucune invitation */
       }
       const w = await getMyWorker().catch(() => null)
-      setOrg(null)
+      setOrgs([])
       setWorker(w)
     } catch {
-      setOrg(null)
+      setOrgs([])
       setWorker(null)
     }
   }
@@ -83,7 +84,7 @@ export default function App() {
       if (u) {
         await resolveRole()
       } else {
-        setOrg(null)
+        setOrgs([])
         setWorker(null)
       }
     })
@@ -129,7 +130,20 @@ export default function App() {
   // Employé : portail dédié.
   if (worker) return <EmployeeApp worker={worker} user={user} onReload={resolveRole} />
 
-  // Employeur : organisation existante, sinon création.
-  if (org) return <ComplyHub org={org} user={user} />
-  return <Onboarding onCreated={(o) => setOrg(o)} />
+  // Aucune organisation : création (onboarding).
+  if (orgs.length === 0) return <Onboarding onCreated={() => resolveRole()} />
+
+  // Cabinet : plusieurs clients, ou mode cabinet activé à l'onboarding.
+  let cabinetFlag = false
+  try {
+    cabinetFlag = localStorage.getItem('complyhub_cabinet') === '1'
+  } catch {
+    /* stockage indisponible */
+  }
+  if (orgs.length >= 2 || cabinetFlag) {
+    return <CabinetDashboard orgs={orgs} user={user} onReload={resolveRole} />
+  }
+
+  // Employeur unique : tableau de bord direct.
+  return <ComplyHub org={orgs[0]} user={user} />
 }
