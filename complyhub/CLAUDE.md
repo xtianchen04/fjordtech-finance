@@ -98,6 +98,11 @@ supabase/functions/
 - **invitations** — invitations d'employés au portail (`pending`/`accepted`/`revoked`).
 - **messages** — fil employeur ↔ employé par travailleur ; `read_at` = accusé de
   lecture (preuve de communication horodatée).
+- **audit_logs** — journal d'audit immuable (migration `2026-10_audit_logs.sql`).
+  Alimenté par des triggers PostgreSQL sur `workers`, `worker_compliance`,
+  `documents`, `messages`, `invitations`. Lecture employeur uniquement, aucune
+  écriture/modification directe (triggers SECURITY DEFINER) ; le NAS est retiré
+  des détails. Onglet « Journal d'audit » + export CSV côté employeur.
 
 **Rôles** :
 - *Employeur* = a créé une organisation (`organizations.created_by = auth.uid()`).

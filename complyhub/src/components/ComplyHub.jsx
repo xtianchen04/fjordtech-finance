@@ -9,6 +9,7 @@ import {
   CreditCard,
   Newspaper,
   MessageSquare,
+  ScrollText,
   Settings as SettingsIcon,
   Users,
   Check,
@@ -39,6 +40,7 @@ import Billing from './Billing'
 import RegulatoryUpdates from './RegulatoryUpdates'
 import Settings from './Settings'
 import Messaging from './Messaging'
+import AuditLog from './AuditLog'
 import WorkerForm from './WorkerForm'
 import WorkerDetail from './WorkerDetail'
 
@@ -50,6 +52,7 @@ const NAV = [
   { id: 'simulator', label: "Simulateur d'inspection", Icon: FileCheck },
   { id: 'vault', label: 'Coffre-fort documentaire', Icon: Lock },
   { id: 'generator', label: 'Générateur de documents', Icon: FileText },
+  { id: 'audit', label: "Journal d'audit", Icon: ScrollText },
   { id: 'billing', label: 'Abonnement', Icon: CreditCard },
   { id: 'settings', label: 'Paramètres', Icon: SettingsIcon },
 ]
@@ -303,6 +306,7 @@ export default function ComplyHub({ org: orgProp, user, demo = false }) {
                 score={score}
               />
             )}
+            {tab === 'audit' && <AuditLog orgId={org.id} workers={workers} />}
             {tab === 'billing' && <Billing org={org} />}
             {tab === 'settings' && <Settings org={org} onSaved={setOrg} />}
           </>

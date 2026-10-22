@@ -537,6 +537,30 @@ export async function getMyDocuments(workerId) {
 }
 
 // ============================================================
+//  JOURNAL D'AUDIT (lecture seule, côté employeur)
+// ============================================================
+
+/**
+ * Récupère le journal d'audit d'une organisation.
+ * @param {string} orgId
+ * @param {{limit?:number, workerId?:string, action?:string}} opts
+ */
+export async function getAuditLogs(orgId, opts = {}) {
+  if (isDemo()) return demoStore.getAuditLogs(orgId, opts)
+  let query = supabase
+    .from('audit_logs')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: false })
+    .limit(opts.limit ?? 200)
+  if (opts.workerId) query = query.eq('worker_id', opts.workerId)
+  if (opts.action) query = query.eq('action', opts.action)
+  const { data, error } = await query
+  if (error) throw error
+  return data ?? []
+}
+
+// ============================================================
 //  MESSAGERIE (employeur ↔ employé, par travailleur)
 // ============================================================
 
