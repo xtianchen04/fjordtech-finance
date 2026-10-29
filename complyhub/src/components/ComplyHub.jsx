@@ -12,6 +12,7 @@ import {
   ScrollText,
   HelpCircle,
   Settings as SettingsIcon,
+  Bot,
   Users,
   Check,
   AlertTriangle,
@@ -47,6 +48,7 @@ import AuditLog from './AuditLog'
 import ResourceCenter from './ResourceCenter'
 import WorkerForm from './WorkerForm'
 import WorkerDetail from './WorkerDetail'
+import AiAssistant from './AiAssistant'
 
 const NAV = [
   { id: 'dashboard', key: 'd_nav_dashboard', Icon: LayoutDashboard },
@@ -54,6 +56,7 @@ const NAV = [
   { id: 'messaging', key: 'd_nav_messaging', Icon: MessageSquare },
   { id: 'updates', key: 'd_nav_updates', Icon: Newspaper },
   { id: 'resources', key: 'd_nav_resources', Icon: HelpCircle },
+  { id: 'assistant', key: 'd_nav_assistant', Icon: Bot },
   { id: 'simulator', key: 'd_nav_simulator', Icon: FileCheck },
   { id: 'vault', key: 'd_nav_vault', Icon: Lock },
   { id: 'generator', key: 'd_nav_generator', Icon: FileText },
@@ -306,6 +309,16 @@ export default function ComplyHub({ org: orgProp, user, demo = false, onBack = n
             {tab === 'messaging' && <Messaging orgId={org.id} workers={workers} />}
             {tab === 'updates' && <RegulatoryUpdates org={org} />}
             {tab === 'resources' && <ResourceCenter kind="employer" province={org.province} />}
+            {tab === 'assistant' && (
+              <AiAssistant
+                context={{
+                  orgName: org.name,
+                  province: org.province,
+                  score,
+                  alerts: alerts.length,
+                }}
+              />
+            )}
             {tab === 'simulator' && <Simulator orgId={org.id} />}
             {tab === 'vault' && (
               <Vault orgId={org.id} documents={documents} workers={workers} onChange={reloadDocuments} />

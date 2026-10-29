@@ -481,6 +481,43 @@ export async function startCheckout(plan) {
 }
 
 // ============================================================
+//  ASSISTANT IA DE CONFORMITÉ (fonction Edge ask-assistant → API Claude)
+// ============================================================
+
+/**
+ * Pose une question à l'assistant IA de conformité (RIPR / PMI / PTET).
+ * @param {string} question
+ * @param {Array<{role:'user'|'assistant', content:string}>} history fil précédent (facultatif)
+ * @param {{orgName?:string, province?:string, program?:string, score?:number, alerts?:number}} context contexte de dossier (facultatif)
+ * @returns {Promise<string>} la réponse de l'assistant
+ */
+export async function askAssistant(question, history = [], context = null) {
+  if (isDemo()) {
+    return (
+      "Démo — l'assistant IA n'est pas connecté en mode démonstration. " +
+      'Déployez la fonction Edge « ask-assistant » et définissez le secret ANTHROPIC_API_KEY ' +
+      'pour activer les réponses réelles (conformité RIPR / PMI / PTET).'
+    )
+  }
+  const { data, error } = await supabase.functions.invoke('ask-assistant', {
+    body: { question, history, context },
+  })
+  if (error) {
+    // Supabase enveloppe les erreurs HTTP ; on tente de récupérer le détail renvoyé par la fonction.
+    let detail = error.message
+    try {
+      const ctx = await error.context?.json?.()
+      if (ctx?.error) detail = ctx.error
+    } catch {
+      /* corps non lisible */
+    }
+    throw new Error(detail || "L'assistant IA est indisponible.")
+  }
+  if (data?.error) throw new Error(data.error)
+  return data?.answer ?? ''
+}
+
+// ============================================================
 //  ÉQUIPE & INVITATIONS (côté employeur)
 // ============================================================
 
