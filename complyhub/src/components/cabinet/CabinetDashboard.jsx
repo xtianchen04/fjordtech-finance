@@ -24,6 +24,7 @@ import {
 import { PROVINCES } from '../../lib/constants'
 import LanguageSwitcher from '../LanguageSwitcher'
 import ComplyHub from '../ComplyHub'
+import AiAssistant from '../AiAssistant'
 
 // ============================================================
 //  Console Cabinet — version réelle (CRM multi-clients).
@@ -192,6 +193,12 @@ export default function CabinetDashboard({ orgs: orgsProp, user, onReload }) {
           Chaque client est un dossier ComplyHub complet. Ouvrez-le pour gérer ses travailleurs,
           sa conformité, ses documents et sa messagerie.
         </p>
+
+        {/* Assistant IA de conformité (portefeuille) */}
+        <AiAssistant
+          className="mt-6"
+          context={{ score: kpis.avg, alerts: kpis.alerts }}
+        />
       </div>
 
       {modal && (
