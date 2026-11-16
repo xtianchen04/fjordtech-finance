@@ -144,6 +144,8 @@ const STRINGS = {
     al_none_desc: "Tous vos permis sont valides et aucune condition critique n'est manquante. Continuez le suivi régulier de vos travailleurs.",
     al_critical: 'Critique',
     al_warning: 'Avertissement',
+    al_reminders_title: 'Rappels proactifs',
+    al_reminders_sub: 'Obligations à anticiper selon votre province — guidance, hors compteur d’alertes.',
     // --- Statuts de conformité ---
     stt_ok: 'Conforme',
     stt_warn: 'À vérifier',
@@ -393,6 +395,8 @@ const STRINGS = {
     al_none_desc: 'All your permits are valid and no critical condition is missing. Keep monitoring your workers regularly.',
     al_critical: 'Critical',
     al_warning: 'Warning',
+    al_reminders_title: 'Proactive reminders',
+    al_reminders_sub: 'Obligations to anticipate based on your province — guidance, not counted as alerts.',
     // --- Compliance statuses ---
     stt_ok: 'Compliant',
     stt_warn: 'To review',
