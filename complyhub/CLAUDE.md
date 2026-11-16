@@ -83,7 +83,10 @@ complyhub/
 
 supabase/functions/
 ├── create-checkout/index.ts        ← session Stripe Checkout
-└── stripe-webhook/index.ts         ← met à jour subscription_tier
+├── stripe-webhook/index.ts         ← met à jour subscription_tier
+├── send-alerts/index.ts            ← courriel d'alertes + rappels proactifs (Resend)
+├── ask-assistant/index.ts          ← assistant IA de conformité (API Claude)
+└── refresh-min-wage/index.ts       ← maintenance auto des taux (Claude + recherche web)
 ```
 
 ## Modèle de données
@@ -98,6 +101,11 @@ supabase/functions/
 - **invitations** — invitations d'employés au portail (`pending`/`accepted`/`revoked`).
 - **messages** — fil employeur ↔ employé par travailleur ; `read_at` = accusé de
   lecture (preuve de communication horodatée).
+- **min_wage_rates** / **min_wage_rate_log** — taux de salaire minimum par
+  province (source unique) + journal des changements (migration
+  `2026-11_min_wage_rates.sql`). Tenus à jour par la fonction Edge
+  `refresh-min-wage` (Claude + recherche web, avec URL source et garde-fous).
+  L'app et `send-alerts` lisent ces taux ; repli sur `src/lib/minWage.js` si non migré.
 - **audit_logs** — journal d'audit immuable (migration `2026-10_audit_logs.sql`).
   Alimenté par des triggers PostgreSQL sur `workers`, `worker_compliance`,
   `documents`, `messages`, `invitations`. Lecture employeur uniquement, aucune

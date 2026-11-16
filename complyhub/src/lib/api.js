@@ -1,7 +1,7 @@
 import { supabase, getCurrentUser } from './supabase'
 import { isDemo, demoStore } from './demo'
 import { normalizeNAS } from './nas'
-import { getMinWage, minWageChange } from './minWage'
+import { getMinWage, minWageChange, setMinWageOverrides } from './minWage'
 import { getRegulator } from './provincialRegulators'
 
 // ============================================================
@@ -555,6 +555,76 @@ export function computeReminders(workers = [], org = null) {
   }
 
   return reminders
+}
+
+// ============================================================
+//  MAINTENANCE AUTO DES TAUX DE SALAIRE MINIMUM
+//  Table min_wage_rates (source unique) + fonction Edge refresh-min-wage.
+// ============================================================
+
+/** Lit les taux de salaire minimum en base (ou [] si table non migrée). */
+export async function getMinWageRates() {
+  if (isDemo()) return []
+  const { data, error } = await supabase
+    .from('min_wage_rates')
+    .select('*')
+    .order('province', { ascending: true })
+  if (error) return [] // table non migrée : repli silencieux sur les taux statiques
+  return data ?? []
+}
+
+/**
+ * Charge les taux depuis la base et les applique comme surcharges (best-effort).
+ * Appelé au démarrage de l'app ; en cas d'échec, les taux statiques servent de repli.
+ */
+export async function loadMinWageRates() {
+  try {
+    const rows = await getMinWageRates()
+    if (rows.length) {
+      const map = {}
+      for (const r of rows) map[r.province] = { rate: Number(r.rate), asOf: r.as_of }
+      setMinWageOverrides(map)
+    }
+  } catch {
+    /* repli sur les taux statiques */
+  }
+}
+
+/** Journal des changements de taux (traçabilité). */
+export async function getMinWageLog(limit = 20) {
+  if (isDemo()) return []
+  const { data, error } = await supabase
+    .from('min_wage_rate_log')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error) return []
+  return data ?? []
+}
+
+/**
+ * Déclenche la mise à jour auto des taux (fonction Edge refresh-min-wage → Claude).
+ * Renvoie le récapitulatif { checked, changed, changes, rejected }.
+ */
+export async function refreshMinWageRates() {
+  if (isDemo()) {
+    throw new Error('La mise à jour des taux n’est pas disponible en mode démo.')
+  }
+  const { data, error } = await supabase.functions.invoke('refresh-min-wage', { body: {} })
+  if (error) {
+    let detail = error.message
+    try {
+      const ctx = await error.context?.json?.()
+      if (ctx?.error) detail = ctx.error
+    } catch {
+      /* corps non lisible */
+    }
+    throw new Error(detail || 'La mise à jour des taux a échoué.')
+  }
+  if (data?.ok === false) throw new Error(data.error || 'La mise à jour des taux a échoué.')
+  // Recharge les surcharges après mise à jour.
+  await loadMinWageRates()
+  return data
 }
 
 // ---------- Facturation (Stripe via fonction Edge Supabase) ----------

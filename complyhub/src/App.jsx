@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { onAuthChange, getCurrentUser } from './lib/supabase'
-import { getMyOrganizations, getMyWorker, acceptPendingInvitations } from './lib/api'
+import { getMyOrganizations, getMyWorker, acceptPendingInvitations, loadMinWageRates } from './lib/api'
 import { enableDemo, DEMO_ORG, DEMO_USER } from './lib/demo'
 import Landing from './components/Landing'
 import Auth from './components/Auth'
@@ -70,6 +70,9 @@ export default function App() {
 
   useEffect(() => {
     let active = true
+
+    // Charge les taux de salaire minimum depuis la base (best-effort).
+    loadMinWageRates()
 
     ;(async () => {
       const u = await getCurrentUser()

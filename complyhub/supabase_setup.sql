@@ -906,3 +906,60 @@ alter table public.organizations
   add column if not exists contact_phone   text,
   add column if not exists client_notes    text,
   add column if not exists last_contact_at timestamptz;
+
+-- ============================================================
+--  SECTION 9 — Maintenance auto des taux de salaire minimum
+--  (voir migrations/2026-11_min_wage_rates.sql)
+--  Table source unique des taux, tenue à jour par la fonction Edge
+--  refresh-min-wage (Claude + recherche web), + journal des changements.
+-- ============================================================
+
+create table if not exists public.min_wage_rates (
+  province    text primary key,
+  rate        numeric(6, 2) not null,
+  as_of       date,
+  source_url  text,
+  checked_at  timestamptz,
+  updated_at  timestamptz not null default now()
+);
+
+create table if not exists public.min_wage_rate_log (
+  id          uuid primary key default gen_random_uuid(),
+  province    text not null,
+  old_rate    numeric(6, 2),
+  new_rate    numeric(6, 2),
+  old_as_of   date,
+  new_as_of   date,
+  source_url  text,
+  note        text,
+  created_at  timestamptz not null default now()
+);
+
+insert into public.min_wage_rates (province, rate, as_of) values
+  ('AB', 15.00, '2024-10-01'),
+  ('BC', 17.40, '2025-06-01'),
+  ('MB', 15.80, '2025-10-01'),
+  ('NB', 15.30, '2025-04-01'),
+  ('NL', 16.00, '2025-04-01'),
+  ('NS', 15.70, '2025-04-01'),
+  ('NT', 16.70, '2024-09-01'),
+  ('NU', 19.00, '2024-01-01'),
+  ('ON', 17.60, '2025-10-01'),
+  ('PE', 16.00, '2025-04-01'),
+  ('QC', 16.10, '2025-05-01'),
+  ('SK', 15.00, '2024-10-01'),
+  ('YT', 17.94, '2025-04-01')
+on conflict (province) do nothing;
+
+alter table public.min_wage_rates enable row level security;
+alter table public.min_wage_rate_log enable row level security;
+
+do $$ begin
+  create policy "min_wage_rates_read"
+    on public.min_wage_rates for select to authenticated using (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy "min_wage_rate_log_read"
+    on public.min_wage_rate_log for select to authenticated using (true);
+exception when duplicate_object then null; end $$;
