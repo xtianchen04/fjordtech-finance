@@ -1,7 +1,8 @@
 import { supabase, getCurrentUser } from './supabase'
 import { isDemo, demoStore } from './demo'
 import { normalizeNAS } from './nas'
-import { getMinWage } from './minWage'
+import { getMinWage, minWageChange } from './minWage'
+import { getRegulator } from './provincialRegulators'
 
 // ============================================================
 //  Couche d'accès aux données ComplyHub (Supabase / PostgREST)
@@ -458,6 +459,102 @@ export function computeAlerts(workers, complianceByWorker, permitWindowDays = 90
   // Les éléments manquants d'abord, puis les avertissements.
   const rank = { missing: 0, warn: 1 }
   return alerts.sort((a, b) => rank[a.severity] - rank[b.severity])
+}
+
+/**
+ * Rappels PROACTIFS (conformité pilotée par la juridiction) — distincts des
+ * alertes « problème » : ils ne comptent pas comme des non-conformités, mais
+ * aident l'employeur à anticiper. Rendus dans une section dédiée.
+ *
+ * Couvre : inscription au régulateur SST provincial (CNESST, WorkSafeNB…),
+ * veille du salaire minimum (changement récent / imminent + salaire proche
+ * du seuil), et assurance santé privée pendant le délai de carence provincial.
+ *
+ * @param {Array} workers
+ * @param {{province?:string, name?:string}} org
+ * @returns {Array<{id:string, kind:'info', title:string, detail:string, action?:{label:string,url:string}}>}
+ */
+export function computeReminders(workers = [], org = null) {
+  const reminders = []
+  const province = org?.province ?? null
+
+  // 1) Inscription au régulateur SST provincial de l'employeur.
+  if (province) {
+    const reg = getRegulator(province)
+    if (reg) {
+      reminders.push({
+        id: `regulator-${province}`,
+        kind: 'info',
+        title: `Inscription ${reg.board} (${province})`,
+        detail:
+          `En tant qu'employeur établi en ${province}, assurez-vous d'être inscrit auprès de ` +
+          `${reg.board} et d'y déclarer votre masse salariale. Cette obligation provinciale de santé ` +
+          `et sécurité au travail est distincte des programmes TET mais souvent vérifiée en inspection.`,
+        action: { label: reg.board, url: reg.url },
+      })
+    }
+  }
+
+  // 2) Veille du salaire minimum : changement récent ou imminent dans une
+  //    province où l'employeur a des travailleurs (ou la province de l'org).
+  const provinces = new Set(
+    [...workers.map((w) => w.work_province).filter(Boolean), province].filter(Boolean),
+  )
+  for (const code of provinces) {
+    const chg = minWageChange(code)
+    if (chg) {
+      const when = chg.upcoming
+        ? `passera à ${chg.rate.toFixed(2)} $/h le ${chg.asOf} (dans ${chg.days} j)`
+        : `est passé à ${chg.rate.toFixed(2)} $/h le ${chg.asOf}`
+      reminders.push({
+        id: `minwage-${code}`,
+        kind: 'info',
+        title: `Salaire minimum — ${code}`,
+        detail:
+          `Le salaire minimum en ${code} ${when}. Reconfirmez que la rémunération de vos ` +
+          `travailleurs reste au moins égale au minimum et substantiellement conforme à l'offre ` +
+          `d'emploi (R209.2). Mettez à jour les contrats si nécessaire.`,
+      })
+    }
+  }
+
+  // 3) Salaire proche du seuil (surveillance) : dans un rayon de 1,00 $/h.
+  for (const w of workers) {
+    if (w.work_province && w.offered_wage != null) {
+      const mw = getMinWage(w.work_province)
+      if (mw) {
+        const margin = Number(w.offered_wage) - mw.rate
+        if (margin >= 0 && margin <= 1.0) {
+          reminders.push({
+            id: `wage-near-${w.id}`,
+            kind: 'info',
+            title: `Salaire proche du minimum — ${w.full_name}`,
+            detail:
+              `Le salaire offert (${Number(w.offered_wage).toFixed(2)} $/h) n'est que ` +
+              `${margin.toFixed(2)} $ au-dessus du minimum de ${w.work_province} ` +
+              `(${mw.rate.toFixed(2)} $/h). Une hausse du salaire minimum pourrait rendre la ` +
+              `rémunération non conforme — à surveiller.`,
+          })
+        }
+      }
+    }
+  }
+
+  // 4) Assurance santé privée pendant le délai de carence provincial.
+  if (workers.length > 0) {
+    reminders.push({
+      id: 'health-insurance',
+      kind: 'info',
+      title: 'Assurance santé privée (délai de carence)',
+      detail:
+        "Pour les travailleurs du PTET (poste à bas salaire), l'employeur doit fournir une assurance " +
+        'maladie privée équivalente couvrant les soins de santé d’urgence tant que le travailleur ' +
+        "n'est pas admissible au régime public de la province. Vérifiez la couverture de chaque " +
+        'nouveau travailleur dès son arrivée, ainsi que les avantages prévus à l’offre d’emploi.',
+    })
+  }
+
+  return reminders
 }
 
 // ---------- Facturation (Stripe via fonction Edge Supabase) ----------

@@ -31,3 +31,20 @@ export const MIN_WAGE = {
 export function getMinWage(provinceCode) {
   return MIN_WAGE[provinceCode] ?? null
 }
+
+/**
+ * Le salaire minimum de cette province a-t-il changé récemment (ou va-t-il
+ * changer prochainement) ? Sert au rappel proactif « reconfirmer les salaires ».
+ * @param {string} provinceCode
+ * @param {number} windowDays fenêtre autour d'aujourd'hui (défaut 120 j)
+ * @returns {null | { rate:number, asOf:string, upcoming:boolean, days:number }}
+ */
+export function minWageChange(provinceCode, windowDays = 120) {
+  const mw = MIN_WAGE[provinceCode]
+  if (!mw?.asOf) return null
+  const asOf = new Date(mw.asOf)
+  if (Number.isNaN(asOf.getTime())) return null
+  const days = Math.round((asOf - new Date()) / (1000 * 60 * 60 * 24))
+  if (Math.abs(days) > windowDays) return null
+  return { rate: mw.rate, asOf: mw.asOf, upcoming: days > 0, days }
+}

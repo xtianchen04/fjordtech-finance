@@ -31,6 +31,7 @@ import {
   getDocuments,
   computeReadinessScore,
   computeAlerts,
+  computeReminders,
 } from '../lib/api'
 import { STATUS } from '../lib/constants'
 import { useLang } from '../lib/LanguageContext'
@@ -153,6 +154,8 @@ export default function ComplyHub({ org: orgProp, user, demo = false, onBack = n
     () => computeAlerts(workers, complianceByWorker, org.alert_window_days ?? 90),
     [workers, complianceByWorker, org.alert_window_days],
   )
+
+  const reminders = useMemo(() => computeReminders(workers, org), [workers, org])
 
   const aggregatedConditions = useMemo(() => {
     return conditions.map((cond) => {
@@ -305,7 +308,7 @@ export default function ComplyHub({ org: orgProp, user, demo = false, onBack = n
                 onOpenWorker={setDetailWorker}
               />
             )}
-            {tab === 'alerts' && <Alerts alerts={alerts} />}
+            {tab === 'alerts' && <Alerts alerts={alerts} reminders={reminders} />}
             {tab === 'messaging' && <Messaging orgId={org.id} workers={workers} />}
             {tab === 'updates' && <RegulatoryUpdates org={org} />}
             {tab === 'resources' && <ResourceCenter kind="employer" province={org.province} />}
