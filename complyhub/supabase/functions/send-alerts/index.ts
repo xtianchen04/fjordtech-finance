@@ -257,6 +257,17 @@ async function sendEmail(to: string, subject: string, html: string) {
 
 Deno.serve(async () => {
   try {
+    // Taux à jour depuis la base (table tenue par refresh-min-wage) ; repli
+    // silencieux sur la table statique MIN_WAGE si la migration n'est pas faite.
+    try {
+      const { data: rateRows } = await admin.from('min_wage_rates').select('province, rate, as_of')
+      for (const row of rateRows ?? []) {
+        MIN_WAGE[row.province] = { rate: Number(row.rate), asOf: row.as_of }
+      }
+    } catch {
+      /* table non migrée */
+    }
+
     // Organisations ayant activé les notifications avec une adresse valide.
     const { data: orgs, error: orgErr } = await admin
       .from('organizations')

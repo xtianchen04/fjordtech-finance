@@ -50,6 +50,7 @@ import ResourceCenter from './ResourceCenter'
 import WorkerForm from './WorkerForm'
 import WorkerDetail from './WorkerDetail'
 import AiAssistant from './AiAssistant'
+import MinWageAdmin from './MinWageAdmin'
 
 const NAV = [
   { id: 'dashboard', key: 'd_nav_dashboard', Icon: LayoutDashboard },
@@ -336,7 +337,14 @@ export default function ComplyHub({ org: orgProp, user, demo = false, onBack = n
             )}
             {tab === 'audit' && <AuditLog orgId={org.id} workers={workers} />}
             {tab === 'billing' && <Billing org={org} />}
-            {tab === 'settings' && <Settings org={org} onSaved={setOrg} />}
+            {tab === 'settings' && (
+              <div className="space-y-6">
+                <Settings org={org} onSaved={setOrg} />
+                <div className="max-w-2xl">
+                  <MinWageAdmin />
+                </div>
+              </div>
+            )}
           </>
         )}
       </main>

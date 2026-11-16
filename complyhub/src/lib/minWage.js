@@ -27,9 +27,22 @@ export const MIN_WAGE = {
   YT: { rate: 17.94, asOf: '2025-04-01' },
 }
 
-/** Retourne { rate, asOf } pour une province, ou null. */
+// Surcharges chargées depuis la base (table min_wage_rates, tenue à jour par
+// la fonction Edge refresh-min-wage). La table statique ci-dessus reste le
+// repli si la migration n'est pas appliquée ou si le chargement échoue.
+let OVERRIDES = {}
+
+/**
+ * Remplace les taux par ceux chargés depuis la base.
+ * @param {Record<string, {rate:number, asOf?:string}>} map
+ */
+export function setMinWageOverrides(map) {
+  OVERRIDES = map && typeof map === 'object' ? map : {}
+}
+
+/** Retourne { rate, asOf } pour une province (base si disponible, sinon statique), ou null. */
 export function getMinWage(provinceCode) {
-  return MIN_WAGE[provinceCode] ?? null
+  return OVERRIDES[provinceCode] ?? MIN_WAGE[provinceCode] ?? null
 }
 
 /**
